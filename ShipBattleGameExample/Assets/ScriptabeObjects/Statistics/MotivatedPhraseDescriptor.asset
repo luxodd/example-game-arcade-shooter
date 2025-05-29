@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8ca4fc7387f9d144bd94e335e32f7d3, type: 3}
+  m_Name: MotivatedPhraseDescriptor
+  m_EditorClassIdentifier: 
+  _motivatedPhrases:
+  - <Stats>k__BackingField: 0
+    <PhrasesIfBetter>k__BackingField:
+    - Amazing! You scored more points than ever before - keep up the momentum!
+    - Great job! Your score is improving. You're mastering the battlefield!
+    - Your high score just got higher. Keep dominating those enemies!
+    <PhrasesIfWorse>k__BackingField:
+    - Don't worry! Every battle is a chance to learn. Try focusing on faster reactions
+      to earn more points next time!
+    - Your score was lower this time, but you'll get it back. Keep up the fight!
+    - It happens to everyone - an off day. Focus on the next run and crush your enemies!
+  - <Stats>k__BackingField: 1
+    <PhrasesIfBetter>k__BackingField:
+    - Incredible! You took down more enemies than last time. Keep up the pressure!
+    - Well done! Your kill count is climbing - you're unstoppable!
+    - You're getting deadlier! More enemies defeated means you're one step closer
+      to mastery
+    <PhrasesIfWorse>k__BackingField:
+    - You defeated fewer enemies this time, but every step counts! Plan your attacks
+      carefully next time.
+    - Less kills? No problem. Refocus, rearm, and get ready for the next wave!
+    - Your streak wasn't as high, but remember - every enemy counts towards mastery!
+  - <Stats>k__BackingField: 2
+    <PhrasesIfBetter>k__BackingField:
+    - "Sharp shooter! Your accuracy improved. Those enemies don\u2019t stand a chance!"
+    - Great aim! You hit more of your shots this time - keep up the precision!
+    - You're becoming a true marksman. Your accuracy keeps improving!
+    <PhrasesIfWorse>k__BackingField:
+    - Your accuracy slipped a little - take a moment to line up your shots and you'll
+      improve!
+    - Missed a few more shots this time? Keep practicing, you'll hit your targets
+      consistently soon!"
+    - Aiming takes patience. Next time, you'll land every shot!
+  - <Stats>k__BackingField: 3
+    <PhrasesIfBetter>k__BackingField:
+    - Fantastic! You progressed further into the level than before. Keep pushing
+      forward!
+    - You're getting closer to the finish line. Great progress!
+    - Well done! You're mastering the level - keep going!
+    <PhrasesIfWorse>k__BackingField:
+    - You didn't make it as far this time, but every run gets you closer to the finish!
+    - The level is tough, but you'll crack it soon. Keep pushing forward!
+    - A setback isn't failure - use it as motivation for the next attempt!
+  - <Stats>k__BackingField: 4
+    <PhrasesIfBetter>k__BackingField:
+    - You survived longer this time - your skills are clearly improving!
+    - Impressive! You're staying in the fight longer and getting stronger.
+    - Great endurance! Every second counts, and you're making them matter!
+    <PhrasesIfWorse>k__BackingField:
+    - "You didn\u2019t last as long this time, but practice makes perfect!"
+    - Shorter survival this time? Remember, the key is to stay calm and adapt to
+      patterns
+    - "You'll master this level soon\u2014stay focused and you'll survive longer
+      next time!"

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48c7a32888aed2a4ab6a2eac791a05e3, type: 3}
+  m_Name: PinCodeMessagesDescriptor
+  m_EditorClassIdentifier: 
+  _pinCodeMessages:
+  - <AttemptsLeft>k__BackingField: 3
+    <Message>k__BackingField: Incorrect PIN. You have <color=yellow>3</color> attempts
+      remaining."
+  - <AttemptsLeft>k__BackingField: 2
+    <Message>k__BackingField: Incorrect PIN. You have <color=yellow>2</color> attempts
+      remaining."
+  - <AttemptsLeft>k__BackingField: 1
+    <Message>k__BackingField: <color=yellow>Warning!</color> Last attempt remaining.
+      Please double-check your PIN.
+  - <AttemptsLeft>k__BackingField: 0
+    <Message>k__BackingField: Too many incorrect attempts. The game will now end.The
+      game will now end.

@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dcb9a03eed03984dbd54d1338275170, type: 3}
+  m_Name: PresetLeaderboardDescriptor
+  m_EditorClassIdentifier: 
+  <LeaderboardDescriptorList>k__BackingField:
+  - <Rank>k__BackingField: 1
+    <Score>k__BackingField: 50000
+    <UserName>k__BackingField: PixelFox
+    <Level>k__BackingField: 1-7
+  - <Rank>k__BackingField: 2
+    <Score>k__BackingField: 46000
+    <UserName>k__BackingField: ZapKing
+    <Level>k__BackingField: 1-7
+  - <Rank>k__BackingField: 3
+    <Score>k__BackingField: 42000
+    <UserName>k__BackingField: NeoByte
+    <Level>k__BackingField: 1-7
+  - <Rank>k__BackingField: 4
+    <Score>k__BackingField: 38000
+    <UserName>k__BackingField: BlazeJet
+    <Level>k__BackingField: 1-6
+  - <Rank>k__BackingField: 5
+    <Score>k__BackingField: 34000
+    <UserName>k__BackingField: StarZap
+    <Level>k__BackingField: 1-5
+  - <Rank>k__BackingField: 6
+    <Score>k__BackingField: 30000
+    <UserName>k__BackingField: OrbX
+    <Level>k__BackingField: 1-5
+  - <Rank>k__BackingField: 7
+    <Score>k__BackingField: 26000
+    <UserName>k__BackingField: Rocket9
+    <Level>k__BackingField: 1-4
+  - <Rank>k__BackingField: 8
+    <Score>k__BackingField: 22000
+    <UserName>k__BackingField: SkyLoom
+    <Level>k__BackingField: 1-3
+  - <Rank>k__BackingField: 9
+    <Score>k__BackingField: 18000
+    <UserName>k__BackingField: FluxRay
+    <Level>k__BackingField: 1-2
+  - <Rank>k__BackingField: 10
+    <Score>k__BackingField: 14000
+    <UserName>k__BackingField: Glitchy
+    <Level>k__BackingField: 1-1

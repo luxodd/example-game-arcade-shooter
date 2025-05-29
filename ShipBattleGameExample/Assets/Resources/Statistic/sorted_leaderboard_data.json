@@ -1,0 +1,116 @@
+{
+  "type": "get_common_leaderboard",
+  "data": {
+    "current_user": {
+      "rank": 19,
+      "game_handle": "VenomStrike",
+      "score_total": 8303
+    },
+    "leaderboard": [
+      {
+        "rank": 1,
+        "game_handle": "BlazeFury",
+        "score_total": 19826
+      },
+      {
+        "rank": 2,
+        "game_handle": "RapidFalcon",
+        "score_total": 18938
+      },
+      {
+        "rank": 3,
+        "game_handle": "RapidFalcon",
+        "score_total": 18596
+      },
+      {
+        "rank": 4,
+        "game_handle": "VenomStrike",
+        "score_total": 17948
+      },
+      {
+        "rank": 5,
+        "game_handle": "NightHunter",
+        "score_total": 16339
+      },
+      {
+        "rank": 6,
+        "game_handle": "IronPhoenix",
+        "score_total": 14303
+      },
+      {
+        "rank": 7,
+        "game_handle": "StormBreaker",
+        "score_total": 13987
+      },
+      {
+        "rank": 8,
+        "game_handle": "BlazeFury",
+        "score_total": 13076
+      },
+      {
+        "rank": 9,
+        "game_handle": "ShadowWolf",
+        "score_total": 12139
+      },
+      {
+        "rank": 10,
+        "game_handle": "ThunderClaw",
+        "score_total": 11609
+      },
+      {
+        "rank": 11,
+        "game_handle": "BlazeFury",
+        "score_total": 11473
+      },
+      {
+        "rank": 12,
+        "game_handle": "DarkWraith",
+        "score_total": 10847
+      },
+      {
+        "rank": 13,
+        "game_handle": "LunarKnight",
+        "score_total": 10471
+      },
+      {
+        "rank": 14,
+        "game_handle": "BlazeFury",
+        "score_total": 10460
+      },
+      {
+        "rank": 15,
+        "game_handle": "SteelSerpent",
+        "score_total": 9324
+      },
+      {
+        "rank": 16,
+        "game_handle": "VenomStrike",
+        "score_total": 9215
+      },
+      {
+        "rank": 17,
+        "game_handle": "RapidFalcon",
+        "score_total": 8990
+      },
+      {
+        "rank": 18,
+        "game_handle": "NeonViper",
+        "score_total": 8483
+      },
+      {
+        "rank": 20,
+        "game_handle": "NightHunter",
+        "score_total": 8023
+      },
+      {
+        "rank": 21,
+        "game_handle": "ObsidianDragon",
+        "score_total": 5891
+      }
+    ]
+  }
+}
+
+
+
+

@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags: []
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - PlayerShip
+  - EnemyShip
+  - PlayerProjectile
+  - EnemyProjectile
+  - Level
+  - Boss
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Water
+    uniqueID: 4286158673
+    locked: 0
+  - name: Ground
+    uniqueID: 3938415575
+    locked: 0
+  - name: Grass
+    uniqueID: 2983130137
+    locked: 0
+  - name: Trees
+    uniqueID: 3665964859
+    locked: 0
+  - name: EnemyShip
+    uniqueID: 1144611367
+    locked: 0
+  - name: Boss
+    uniqueID: 2577800511
+    locked: 0
+  - name: BossEnemies
+    uniqueID: 1356533699
+    locked: 0
+  - name: Particles
+    uniqueID: 2050563015
+    locked: 0
+  - name: PlayerShip
+    uniqueID: 1294446461
+    locked: 0
+  - name: Projectiles
+    uniqueID: 225696163
+    locked: 0
+  - name: Helpers
+    uniqueID: 1794442023
+    locked: 0
+  - name: UI
+    uniqueID: 1456734187
+    locked: 0

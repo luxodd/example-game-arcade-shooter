@@ -1,0 +1,79 @@
+using System.Collections;
+using Game.Common;
+using UnityEngine;
+
+namespace Game.Enemy
+{
+    public class TurretRotationBehaviour : ActivatorBehaviour
+    {
+        public bool IsRotationReady { get; private set; }
+        [SerializeField] private float _turretRotationSpeed;
+        [SerializeField] private Transform _turretTransform;
+        [SerializeField] private Transform _targetTransform;
+
+        private bool _isActive;
+
+        private Coroutine _turretRotationCoroutine;
+
+        public void SetTarget(Transform target)
+        {
+            _targetTransform = target;
+        }
+
+        protected override void OnActivate()
+        {
+            _isActive = true;
+            _turretRotationCoroutine = StartCoroutine(TurretRotation());
+        }
+
+        protected override void OnDeactivate()
+        {
+            _isActive = false;
+            if (_turretRotationCoroutine == null) return;
+            StopCoroutine(_turretRotationCoroutine);
+            _turretRotationCoroutine = null;
+        }
+
+        [ContextMenu("Activate")]
+        private void TestActivate()
+        {
+            Activate();
+        }
+
+        [ContextMenu("Deactivate")]
+        private void TestDeactivate()
+        {
+            Deactivate();
+        }
+
+        private IEnumerator TurretRotation()
+        {
+            if (_isActive == false) yield break;
+
+            while (_isActive)
+            {
+                if (_isActive == false) yield break;
+
+                IsRotationReady = false;
+                Vector2 direction = (_targetTransform.position - transform.position).normalized;
+
+                Vector2 currentForward = transform.up;
+
+                float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+                float turretAngle = Mathf.Atan2(currentForward.y, currentForward.x) * Mathf.Rad2Deg;
+                float finalAngle = (targetAngle - turretAngle) - 180f;
+
+                _turretTransform.localRotation = Quaternion.Lerp(_turretTransform.localRotation,
+                    Quaternion.Euler(0, 0, finalAngle), _turretRotationSpeed * Time.deltaTime);
+
+                if (_turretTransform.localRotation == Quaternion.Euler(0, 0, finalAngle))
+                {
+                    IsRotationReady = true;
+                }
+
+                yield return null;
+            }
+        }
+    }
+}
