@@ -21,7 +21,8 @@ namespace Game.UI
         void SetResponseText(string text);
 
         void SetBuildVersion(string version);
-        void SetCredits(int credits);
+        void SetPluginVersion(string version);
+        void SetCredits(float credits);
     }
 
     public class MainMenuView : BaseView, IMainMenuView
@@ -34,6 +35,7 @@ namespace Game.UI
         [SerializeField] private TMP_Text _highScoreText;
         [SerializeField] private TMP_Text _responseText;
         [SerializeField] private TMP_Text _buildVersionText;
+        [SerializeField] private TMP_Text _pluginVersionText;
         [SerializeField] private TMP_Text _creditsCountText;
         [SerializeField] private Button _playButton;
         [SerializeField] private Button _leaderboardButton;
@@ -50,6 +52,7 @@ namespace Game.UI
         private string _playerNameFormatted;
 
         private string _buildVersionFormatted;
+        private string _pluginVersionFormatted;
 
         private Tweener _tweener;
 
@@ -97,9 +100,14 @@ namespace Game.UI
             _buildVersionText.text = string.Format(_buildVersionFormatted, version);
         }
 
-        public void SetCredits(int credits)
+        public void SetPluginVersion(string version)
         {
-            _creditsCountText.text = credits.ToString();
+            _pluginVersionText.text = string.Format(_pluginVersionFormatted, version);
+        }
+
+        public void SetCredits(float credits)
+        {
+            _creditsCountText.text = credits.ToString("F2");
         }
 
         protected override void OnAwake()
@@ -108,6 +116,7 @@ namespace Game.UI
 
             _playerNameFormatted = _playerNameText.text;
             _buildVersionFormatted = _buildVersionText.text;
+            _pluginVersionFormatted = _pluginVersionText.text;
 
             _playButton.onClick.AddListener(OnPlayButtonClicked);
             _leaderboardButton.onClick.AddListener(OnLeaderboardButtonClicked);

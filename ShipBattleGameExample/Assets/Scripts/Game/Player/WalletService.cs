@@ -12,23 +12,23 @@ namespace Game.Player
 
     public class WalletService : MonoBehaviour
     {
-        public IIntReadOnlyProperty Credits => _credits;
+        public IFloatReadOnlyProperty Credits => _credits;
 
-        private IntProperty _credits = new IntProperty();
+        private FloatProperty _credits = new FloatProperty();
 
         private Dictionary<MoneyType, int> _money = new Dictionary<MoneyType, int>();
 
-        public void AddCredits(int amount)
+        public void AddCredits(float amount)
         {
             _credits.SetValue(_credits.Value + amount);
         }
 
-        public void SetCredits(int amount)
+        public void SetCredits(float amount)
         {
             _credits.SetValue(amount);
         }
 
-        public void SpendCredits(int amount)
+        public void SpendCredits(float amount)
         {
             var remaining = _credits.Value - amount;
             if (remaining < 0)
@@ -77,6 +77,6 @@ namespace Game.Player
 
     public class WalletStorageData
     {
-        public int CreditsCount { get; set; }
+        public float CreditsCount { get; set; }
     }
 }

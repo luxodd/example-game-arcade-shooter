@@ -23,17 +23,17 @@ namespace Game.UI.Handlers
             _widgetView.Hide();
         }
 
-        public void SetCreditsCount(int creditsCount)
+        public void SetCreditsCount(float creditsCount)
         {
             _widgetView.SetCreditsCount(creditsCount);
         }
 
-        public void AddCreditsAnimated(int currentCredits, int creditsToAdd, Action onDone)
+        public void AddCreditsAnimated(float currentCredits, float creditsToAdd, Action onDone)
         {
             _widgetView.AddAnimatedCredits(currentCredits, creditsToAdd, onDone);
         }
 
-        public void RemoveCreditsAnimated(int currentCredits, int creditsToRemove, Action onDone)
+        public void RemoveCreditsAnimated(float currentCredits, float creditsToRemove, Action onDone)
         {
             _widgetView.RemoveAnimatedCredits(currentCredits, creditsToRemove, onDone);
         }

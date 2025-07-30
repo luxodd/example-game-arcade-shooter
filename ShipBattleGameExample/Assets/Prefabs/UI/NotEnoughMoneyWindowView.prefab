@@ -833,6 +833,8 @@ MonoBehaviour:
   - {fileID: 8045091345844970061}
   - {fileID: 2859980823163732212}
   - {fileID: 5489735561244641900}
+  _useConcreteSelection: 0
+  _selectedItem: {fileID: 0}
   _navigationType: 3
   _itemsInRow: 4
   _keyForButtonSubmitJoystick: 330

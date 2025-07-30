@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Luxodd.Game.HelpersAndUtils.Utils;
+using Luxodd.Game.Scripts;
+using Luxodd.Game.Scripts.HelpersAndUtils;
 using Luxodd.Game.Scripts.HelpersAndUtils.Logger;
 using Luxodd.Game.Scripts.Network;
 using Luxodd.Game.Scripts.Network.CommandHandler;
@@ -21,6 +23,7 @@ namespace Luxodd.Game.Example.Scripts
         [SerializeField] private WebSocketService _webSocketService;
         [SerializeField] private WebSocketCommandHandler _webSocketCommandHandler;
         [SerializeField] private HealthStatusCheckService _healthStatusCheckService;
+        [SerializeField] private ReconnectService _reconnectService;
 
         [SerializeField] private int _creditsToCharge = 3;
         [SerializeField] private int _creditsToAdd = 5;
@@ -28,7 +31,7 @@ namespace Luxodd.Game.Example.Scripts
         [SerializeField] private List<string> _spaceshipNames;
         [SerializeField] private List<int> _levels;
 
-        private readonly IntProperty _credits = new IntProperty();
+        private readonly FloatProperty _credits = new FloatProperty();
         private readonly CustomProperty<string> _userName = new CustomProperty<string>();
         private readonly BoolProperty _isConnected = new BoolProperty();
         private CustomProperty<string> _rawResponse = new CustomProperty<string>();
@@ -40,6 +43,7 @@ namespace Luxodd.Game.Example.Scripts
         {
             PrepareStorageCommands();
             SubscribeToEvents();
+            CoroutineManager.DelayedAction(0.5f, () => LoggerHelper.Log("Warming Up CoroutineManager"));
         }
 
         private void Start()
@@ -55,6 +59,8 @@ namespace Luxodd.Game.Example.Scripts
             _rawResponse.SetValue(string.Empty);
             _spaceShipName.SetValue(_spaceshipNames.First());
             _level.SetValue(_levels.First());
+            
+            _mainMenuPanelViewHandler.SetUnityPluginVersion(PluginVersion.Version);
         }
         
         private void SubscribeToEvents()
@@ -109,9 +115,26 @@ namespace Luxodd.Game.Example.Scripts
 
         private void OnConnectToServerSuccess()
         {
+            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnConnectToServerSuccess)}] OK");
             _mainMenuPanelViewHandler.HideProcessing();
             //update status
             _isConnected.SetValue(_webSocketService.IsConnected);
+        }
+        
+        private void OnReconnectionServiceStatusChanged(ReconnectionState reconnectionState)
+        {
+            switch (reconnectionState)
+            {
+                case ReconnectionState.Connecting:
+                    _mainMenuPanelViewHandler.ShowProcessing();
+                    break;
+                case ReconnectionState.Connected:
+                    _mainMenuPanelViewHandler.HideProcessing();
+                    break;
+                case ReconnectionState.ConnectingFailed:
+                    _mainMenuPanelViewHandler.HideProcessing();
+                    break;
+            }
         }
 
         private void OnSendHealthStatusCommand(bool isOn)
@@ -145,7 +168,7 @@ namespace Luxodd.Game.Example.Scripts
             _rawResponse.SetValue(response);
         }
 
-        private void OnGetUserBalanceSuccess(int credits)
+        private void OnGetUserBalanceSuccess(float credits)
         {
             _credits.SetValue(credits);
         }

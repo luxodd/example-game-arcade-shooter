@@ -1,5 +1,6 @@
 using System;
 using Game.Player;
+using Luxodd.Game.Scripts;
 using Luxodd.Game.Scripts.HelpersAndUtils;
 using Luxodd.Game.Scripts.HelpersAndUtils.Logger;
 using UnityEngine;
@@ -25,6 +26,7 @@ namespace Game.UI.Handlers
             _mainMenuView = mainMenuView;
 
             _mainMenuView.SetBuildVersion(Application.version);
+            _mainMenuView.SetPluginVersion(PluginVersion.Version);
             _mainMenuView.KeyboardNavigator.OnKeySubmitted.AddListener(OnVirtualKeyboardKeySubmit);
         }
 
@@ -72,7 +74,7 @@ namespace Game.UI.Handlers
             _mainMenuView.Hide();
         }
 
-        public void OnCreditsCountChangedHandler(int creditsCount)
+        public void OnCreditsCountChangedHandler(float creditsCount)
         {
             _mainMenuView.SetCredits(creditsCount);
         }

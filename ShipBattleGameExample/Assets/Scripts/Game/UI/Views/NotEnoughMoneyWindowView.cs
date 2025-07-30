@@ -19,7 +19,7 @@ namespace Game.UI.Views
         void SetCancelButtonClickCallback(Action cancelButtonClickedCallback);
         void SetErrorMessageDisplayedCallback(Action errorDisplayedCallback);
 
-        void SetDifferenceCreditsCount(int creditsCount);
+        void SetDifferenceCreditsCount(float creditsCount);
 
         void SetChargeCreditsCount(List<int> chargeCreditsCountList);
 
@@ -65,9 +65,9 @@ namespace Game.UI.Views
             _onErrorMessageDisplayed = errorDisplayedCallback;
         }
 
-        public void SetDifferenceCreditsCount(int creditsCount)
+        public void SetDifferenceCreditsCount(float creditsCount)
         {
-            _creditsCountText.text = string.Format(_creditsCountTextFormat, creditsCount);
+            _creditsCountText.text = string.Format(_creditsCountTextFormat, creditsCount.ToString("F2"));
         }
 
         public void SetChargeCreditsCount(List<int> chargeCreditsCountList)

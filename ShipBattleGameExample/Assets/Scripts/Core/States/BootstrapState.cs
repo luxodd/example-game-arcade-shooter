@@ -163,7 +163,7 @@ namespace Core.States
             LoggerHelper.LogError($"[{DateTime.Now}][{GetType().Name}][{nameof(OnProfileRequestFailureHandler)}] OK, status: {statusCode} Error: {errorMessage}");
         }
 
-        private void OnUserBalanceRequestSuccessHandler(int balance)
+        private void OnUserBalanceRequestSuccessHandler(float balance)
         {
             LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnUserBalanceRequestSuccessHandler)}] OK, balance: {balance}");
             _walletService.SetCredits(balance);

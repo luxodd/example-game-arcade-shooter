@@ -70,7 +70,7 @@ namespace Game.UI.UseCases
             }
         }
 
-        private void OnSpendCreditsSuccess(int amount, Action onSuccess)
+        private void OnSpendCreditsSuccess(float amount, Action onSuccess)
         {
             LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnSpendCreditsSuccess)}] OK");
             _creditsWidgetHandler.RemoveCreditsAnimated(_walletService.Credits.Value, amount, () =>
@@ -89,7 +89,7 @@ namespace Game.UI.UseCases
             HandleErrorStatusCode(statusCode);
         }
 
-        private void PrepareAndShowNotEnoughMoneyWindow(int differenceCreditsCount)
+        private void PrepareAndShowNotEnoughMoneyWindow(float differenceCreditsCount)
         {
             LoggerHelper.Log(
                 $"[{DateTime.Now}][{GetType().Name}][{nameof(PrepareAndShowNotEnoughMoneyWindow)}] OK, difference: {differenceCreditsCount}");
@@ -168,15 +168,16 @@ namespace Game.UI.UseCases
             _onCreditsChargeCancelCallback?.Invoke();
         }
 
-        private List<int> GetCreditsToCharge(int differences)
+        private List<int> GetCreditsToCharge(float floatDifferences)
         {
+            var differences = Mathf.CeilToInt(floatDifferences); 
             var result = new List<int>(_settings.CreditsForDeposit);
             //check if we have the same value
             //if not then check if more or less than difference 
             //if less, then remove last value and add difference at the start
             //if more, then 
             //example: 3, 5, 10, 20
-            //difference: 1
+            //differences: 1
             //difference: 6
 
             if (result.Contains(differences))
@@ -213,7 +214,7 @@ namespace Game.UI.UseCases
             return result;
         }
 
-        private void OnUserBalanceRequestSuccess(int userBalance)
+        private void OnUserBalanceRequestSuccess(float userBalance)
         {
             _walletService.SetCredits(userBalance);
         }

@@ -123,10 +123,13 @@ namespace Luxodd.Game.Scripts.Network
 
             _currentReconnectAttempt++;
             
+            LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnDisconnected)}] OK, attempt: {_currentReconnectAttempt}");
+            
             CoroutineManager.DelayedAction(_delayBetweenReconnections, () =>
             {
-                _webSocketService.ConnectToServer();
-                SwitchToState(ReconnectionState.Connecting);    
+                LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnDisconnected)}] OK, start to connect");
+                //_webSocketService.ConnectToServer();
+                SwitchToState(ReconnectionState.InProcess);    
             });
         }
 

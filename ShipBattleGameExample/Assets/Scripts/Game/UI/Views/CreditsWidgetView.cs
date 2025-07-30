@@ -9,9 +9,9 @@ namespace Game.UI.Views
 {
     public interface ICreditsWidgetView : IView
     {
-        void SetCreditsCount(int creditsCount);
-        void AddAnimatedCredits(int currentCredits, int creditsToAdd, Action onDone);
-        void RemoveAnimatedCredits(int currentCredits, int creditsToRemove, Action onDone);
+        void SetCreditsCount(float creditsCount);
+        void AddAnimatedCredits(float currentCredits, float creditsToAdd, Action onDone);
+        void RemoveAnimatedCredits(float currentCredits, float creditsToRemove, Action onDone);
     }
     
     public class CreditsWidgetView : BaseView, ICreditsWidgetView
@@ -47,21 +47,21 @@ namespace Game.UI.Views
         [SerializeField] private Color _addCreditsColor;
         [SerializeField] private Color _removeCreditsColor;
         
-        private int _creditsToAddCount;
-        private int _currentCreditsCount;
-        private int _creditsToRemoveCount;
+        private float _creditsToAddCount;
+        private float _currentCreditsCount;
+        private float _creditsToRemoveCount;
         
         private Color _currentCreditsColor;
         
         private Action _onDone;
         
-        public void SetCreditsCount(int creditsCount)
+        public void SetCreditsCount(float creditsCount)
         {
             _currentCreditsCount = creditsCount;
             _creditsText.text = _currentCreditsCount.ToString();
         }
 
-        public void AddAnimatedCredits(int currentCredits, int creditsToAdd, Action onDone)
+        public void AddAnimatedCredits(float currentCredits, float creditsToAdd, Action onDone)
         {
             _currentCreditsCount = currentCredits;
             _onDone = onDone;
@@ -69,7 +69,7 @@ namespace Game.UI.Views
             StartCreditsAddAnimation();
         }
 
-        public void RemoveAnimatedCredits(int currentCredits, int creditsToRemove, Action onDone)
+        public void RemoveAnimatedCredits(float currentCredits, float creditsToRemove, Action onDone)
         {
             LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(RemoveAnimatedCredits)}] OK, " +
                       $"newCreditsCount = {currentCredits - creditsToRemove}, _creditsToRemoveCount = {creditsToRemove}");

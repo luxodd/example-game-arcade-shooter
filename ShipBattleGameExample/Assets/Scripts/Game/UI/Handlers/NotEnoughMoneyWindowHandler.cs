@@ -37,7 +37,7 @@ namespace Game.UI.Handlers
             _notEnoughMoneyWindowView.Hide();
         }
 
-        public void SetDifferenceCreditsCount(int creditsCount)
+        public void SetDifferenceCreditsCount(float creditsCount)
         {
             _notEnoughMoneyWindowView.SetDifferenceCreditsCount(creditsCount);
         }
