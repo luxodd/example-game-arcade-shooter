@@ -10,8 +10,8 @@ namespace Game.UI.Views
     public interface IGameOverWindowView : IView
     {
         VirtualKeyboardNavigator KeyboardNavigator { get; }
-        void SetYesButtonClickedHandler(System.Action callback);
-        void SetNoButtonClickedHandler(System.Action callback);
+        void SetRestartButtonClickedHandler(System.Action callback);
+        void SetNextButtonClickedHandler(System.Action callback);
 
         void SetCreditsCount(int creditsCount);
 
@@ -24,6 +24,9 @@ namespace Game.UI.Views
         void SetMotivatedPhrase(string phrase);
 
         void SetLevelNumber(int levelNumber);
+
+        void SetRestartView();
+        void SetNextView();
     }
 
     public class GameOverWindowView : BaseView, IGameOverWindowView
@@ -31,8 +34,8 @@ namespace Game.UI.Views
         public override ViewType ViewType => ViewType.GameOverWindow;
         public VirtualKeyboardNavigator KeyboardNavigator => _keyboardNavigator;
 
-        [SerializeField] private Button _yesButton;
-        [SerializeField] private Button _noButton;
+        [SerializeField] private Button _restartButton;
+        [SerializeField] private Button _nextButton;
 
         [SerializeField] private TMP_Text _creditsText;
         [SerializeField] private TMP_Text _gameResultText;
@@ -42,20 +45,20 @@ namespace Game.UI.Views
         [SerializeField] private GameObject _differenceDataHolder;
         [SerializeField] private VirtualKeyboardNavigator _keyboardNavigator;
 
-        private System.Action _yesButtonClickedHandler;
-        private System.Action _noButtonClickedHandler;
+        private System.Action _restartButtonClickedHandler;
+        private System.Action _nextButtonClickedHandler;
 
         private string _creditsTextFormat;
         private string _levelNumberTextFormat;
 
-        public void SetYesButtonClickedHandler(Action callback)
+        public void SetRestartButtonClickedHandler(Action callback)
         {
-            _yesButtonClickedHandler = callback;
+            _restartButtonClickedHandler = callback;
         }
 
-        public void SetNoButtonClickedHandler(Action callback)
+        public void SetNextButtonClickedHandler(Action callback)
         {
-            _noButtonClickedHandler = callback;
+            _nextButtonClickedHandler = callback;
         }
 
         public void SetCreditsCount(int creditsCount)
@@ -92,6 +95,18 @@ namespace Game.UI.Views
             _levelNumberText.text = string.Format(_levelNumberTextFormat, levelNumber);
         }
 
+        public void SetRestartView()
+        {
+            _nextButton.transform.parent.gameObject.SetActive(false);
+            _restartButton.transform.parent.gameObject.SetActive(true);
+        }
+
+        public void SetNextView()
+        {
+            _nextButton.transform.parent.gameObject.SetActive(true);
+            _restartButton.transform.parent.gameObject.SetActive(false);
+        }
+
         protected override void OnAwake()
         {
             base.OnAwake();
@@ -99,8 +114,8 @@ namespace Game.UI.Views
             _creditsTextFormat = _creditsText.text;
             _levelNumberTextFormat = _levelNumberText.text;
 
-            _yesButton.onClick.AddListener(OnYesButtonClicked);
-            _noButton.onClick.AddListener(OnNoButtonClicked);
+            _restartButton.onClick.AddListener(OnRestartButtonClicked);
+            _nextButton.onClick.AddListener(OnNextButtonClicked);
         }
 
         protected override void OnShow()
@@ -115,14 +130,14 @@ namespace Game.UI.Views
             _keyboardNavigator.Deactivate();
         }
 
-        private void OnYesButtonClicked()
+        private void OnRestartButtonClicked()
         {
-            _yesButtonClickedHandler?.Invoke();
+            _restartButtonClickedHandler?.Invoke();
         }
 
-        private void OnNoButtonClicked()
+        private void OnNextButtonClicked()
         {
-            _noButtonClickedHandler?.Invoke();
+            _nextButtonClickedHandler?.Invoke();
         }
     }
 

@@ -232,13 +232,53 @@ namespace Core.States
 
         private void PrepareAndShowContinueGameWindow()
         {
-            _continueGameWindowHandler.SetCancelButtonClickCallback(OnContinueGameWindowCancelButtonClickHandler);
-            _continueGameWindowHandler.SetContinueButtonClickCallback(OnContinueGameWindowContinueButtonClickHandler);
-            _continueGameWindowHandler.SetCreditsCount(_defaultGameSettings.CreditsForContinueGame);
+            _webSocketService.SendSessionOptionContinue(OnSessionOptionContinueCallback);
+        }
 
-            _creditsWidgetHandler.SetCreditsCount(_walletService.Credits.Value);
-            _creditsWidgetHandler.ShowCreditsWidget();
-            _continueGameWindowHandler.ShowContinueGameWindow();
+        [ContextMenu("Test Continue Session")]
+        private void TestContinueSessionCallback()
+        {
+            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(TestContinueSessionCallback)}] OK");
+            OnSessionOptionContinueCallback(SessionOptionAction.Continue);
+        }
+        
+        [ContextMenu("Test Restart Session")]
+        private void TestRestartSessionCallback()
+        {
+            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(TestRestartSessionCallback)}] OK");
+            OnSessionOptionContinueCallback(SessionOptionAction.Restart);
+        }
+        
+        [ContextMenu("Test Cancel Session")]
+        private void TestCancelSessionCallback()
+        {
+            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(TestCancelSessionCallback)}] OK");
+            OnSessionOptionContinueCallback(SessionOptionAction.Cancel);
+        }
+
+        private void OnSessionOptionContinueCallback(SessionOptionAction sessionOptionAction)
+        {
+            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnSessionOptionContinueCallback)}] OK, sessionOptionAction: {sessionOptionAction}");
+            switch (sessionOptionAction)
+            {
+                case SessionOptionAction.Restart:
+                    _gameOverWindowHandler.SetRestartView();
+                    _gameOverWindowHandler.SetRestartButtonCallback(RestartGame);
+                    PrepareAndShowGameOverWindow();
+                    break;
+                case SessionOptionAction.Continue:
+                    OnContinueGameChargeSuccessHandler();
+                    break;
+                case SessionOptionAction.End:
+                    break;
+                case SessionOptionAction.Cancel:
+                    _gameOverWindowHandler.SetNextView();
+                    _gameOverWindowHandler.SetNextButtonCallback(OnGameOverWindowNoButtonClickHandler);
+                    PrepareAndShowGameOverWindow();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(sessionOptionAction), sessionOptionAction, null);
+            }
         }
 
         private void OnContinueGameWindowCancelButtonClickHandler()
@@ -282,14 +322,10 @@ namespace Core.States
 
         private void PrepareAndShowGameOverWindow()
         {
-            _gameOverWindowHandler.SetYesButtonCallback(OnGameOverWindowYesButtonClickHandler);
-            _gameOverWindowHandler.SetNoButtonCallback(OnGameOverWindowNoButtonClickHandler);
-
-            _gameOverWindowHandler.SetCreditsCount(_defaultGameSettings.CreditsForGame);
-
-            _gameOverWindowHandler.SetLevelNumber(_playerBehaviour.CurrentLevel);
-
             //prepare statistics
+            
+            _gameOverWindowHandler.SetLevelNumber(_playerBehaviour.CurrentLevel);
+            
             EventAggregator.Post(this,
                 new GameOverEvent() { CurrentLevelPosition = _cameraFollowBehaviour.CurrentPosition });
             _scoreManager.RecordResult();
@@ -319,8 +355,24 @@ namespace Core.States
 
             _webSocketCommandHandler.SendLevelEndRequestCommand(_playerBehaviour.CurrentLevel,
                 levelStatisticData.TotalScore, OnLevelEndRequestSuccessHandler, OnLevelEndRequestFailureHandler);
-
+            
             _gameOverWindowHandler.ShowGameOverWindow();
+        }
+
+        private void OnSessionOptionRestartButtonClickHandler(SessionOptionAction sessionOptionAction)
+        {
+            switch (sessionOptionAction)
+            {
+                case SessionOptionAction.Restart:
+                    RestartGame();
+                    break;
+                case SessionOptionAction.Continue:
+                    break;
+                case SessionOptionAction.End:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(sessionOptionAction), sessionOptionAction, null);
+            }
         }
 
         private void OnGameOverWindowYesButtonClickHandler()

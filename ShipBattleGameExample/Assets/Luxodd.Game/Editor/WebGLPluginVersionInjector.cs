@@ -17,8 +17,8 @@ namespace Luxodd.Game.Editor
         {
             if (report.summary.platform != BuildTarget.WebGL) return;
 
-            string templatePath = "Assets/WebGLTemplates/TemplateWithInstance/index.html.template";
-            string outputPath = "Assets/WebGLTemplates/TemplateWithInstance/index.html";
+            string templatePath = "Assets/WebGLTemplates/LuxoddTemplate/index.html.template";
+            string outputPath = "Assets/WebGLTemplates/LuxoddTemplate/index.html";
             
             string html = File.ReadAllText(templatePath);
 

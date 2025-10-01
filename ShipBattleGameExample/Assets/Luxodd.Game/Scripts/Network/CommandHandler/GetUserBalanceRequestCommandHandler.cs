@@ -1,5 +1,6 @@
 ﻿using System;
 using Luxodd.Game.Scripts.HelpersAndUtils.Logger;
+using Luxodd.Game.Scripts.Network.Payloads;
 #if NEWTONSOFT_JSON
 using Newtonsoft.Json;
 #endif
@@ -20,7 +21,7 @@ namespace Luxodd.Game.Scripts.Network.CommandHandler
 
             var commandRequest = new CommandRequestJson()
             {
-                Type = CommandRequestType.GetUserBalanceRequest.ToString()
+                Type = nameof(CommandRequestType.GetUserBalanceRequest)
             };
 
 #if NEWTONSOFT_JSON

@@ -18,7 +18,9 @@ namespace Luxodd.Game.Scripts.Network
         LeaderboardRequest,
         GetUserDataRequest,
         SetUserDataRequest,
-        GetGameSessionInfoRequest
+        GetGameSessionInfoRequest,
+        SendStrategicBettingResultRequest,
+        GetBettingSessionMissionsRequest
     }
 
     public enum CommandResponseType
@@ -37,7 +39,9 @@ namespace Luxodd.Game.Scripts.Network
         LeaderboardResponse,
         GetUserDataResponse,
         SetUserDataResponse,
-        GetGameSessionInfoResponse
+        GetGameSessionInfoResponse,
+        SendStrategicBettingResultResponse,
+        GetBettingSessionMissionsResponse
     }
 
     public enum PayloadParameterTypes
@@ -67,6 +71,8 @@ namespace Luxodd.Game.Scripts.Network
                 CommandResponseType.GetUserDataResponse => CommandRequestType.GetUserDataRequest,
                 CommandResponseType.SetUserDataResponse => CommandRequestType.SetUserDataRequest,
                 CommandResponseType.GetGameSessionInfoResponse => CommandRequestType.GetGameSessionInfoRequest,
+                CommandResponseType.SendStrategicBettingResultResponse => CommandRequestType.SendStrategicBettingResultRequest,
+                CommandResponseType.GetBettingSessionMissionsResponse  => CommandRequestType.GetBettingSessionMissionsRequest,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }
@@ -89,6 +95,8 @@ namespace Luxodd.Game.Scripts.Network
                 CommandRequestType.GetUserDataRequest => CommandResponseType.GetUserDataResponse,
                 CommandRequestType.SetUserDataRequest => CommandResponseType.SetUserDataResponse,
                 CommandRequestType.GetGameSessionInfoRequest => CommandResponseType.GetGameSessionInfoResponse,
+                CommandRequestType.SendStrategicBettingResultRequest =>  CommandResponseType.SendStrategicBettingResultResponse,
+                CommandRequestType.GetBettingSessionMissionsRequest => CommandResponseType.GetBettingSessionMissionsResponse,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
         }

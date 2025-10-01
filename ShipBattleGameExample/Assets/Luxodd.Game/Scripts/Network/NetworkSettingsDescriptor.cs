@@ -13,6 +13,6 @@ namespace Luxodd.Game.Scripts.Network
     public class NetworkSettingsDescriptor : ScriptableObject
     {
         [field:SerializeField] public string ServerAddress { get; private set; }
-        [field:SerializeField] public string DeveloperDebugToken { get; set; }
+        [field: SerializeField] public string DeveloperDebugToken { get; set; }
     }
 }

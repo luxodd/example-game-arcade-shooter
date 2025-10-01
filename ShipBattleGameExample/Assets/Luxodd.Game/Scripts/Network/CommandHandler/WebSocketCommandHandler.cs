@@ -4,6 +4,8 @@ using System.Linq;
 using Luxodd.Game.HelpersAndUtils.Utils;
 using Luxodd.Game.Scripts.Game.Leaderboard;
 using Luxodd.Game.Scripts.HelpersAndUtils.Logger;
+using Luxodd.Game.Scripts.Missions;
+using Luxodd.Game.Scripts.Network.Payloads;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -38,7 +40,8 @@ namespace Luxodd.Game.Scripts.Network.CommandHandler
                 OnProfileResponseHandler(commandHandler, onSuccessCallback, onFailureCallback));
         }
 
-        public void SendUserBalanceRequestCommand(Action<float> onSuccessCallback, Action<int, string> onFailureCallback)
+        public void SendUserBalanceRequestCommand(Action<float> onSuccessCallback,
+            Action<int, string> onFailureCallback)
         {
             //if (CheckConnectionStatus(onFailureCallback) == false) return;
 
@@ -58,20 +61,22 @@ namespace Luxodd.Game.Scripts.Network.CommandHandler
                 () => OnAddBalanceRequestSuccessHandler(commandHandler, onSuccess, onFailureCallback), amount, pinCode);
         }
 
-        public void SendChargeUserBalanceRequestCommand(int amount, int pinCode, Action onSuccess, Action<int, string> onFailureCallback)
+        public void SendChargeUserBalanceRequestCommand(int amount, int pinCode, Action onSuccess,
+            Action<int, string> onFailureCallback)
         {
             if (CheckConnectionStatus(onFailureCallback) == false) return;
 
             _commandProcessStateChangeEvent.Notify(CommandProcessState.Sent);
             var commandHandler = _commandHandlers[CommandRequestType.ChargeUserBalanceRequest];
             commandHandler.SendCommand(
-                () => OnChargeUserBalanceRequestSuccessHandler(commandHandler, onSuccess, onFailureCallback), amount, pinCode);
+                () => OnChargeUserBalanceRequestSuccessHandler(commandHandler, onSuccess, onFailureCallback), amount,
+                pinCode);
         }
 
         public void SendHealthCheckStatusCommand(Action onSuccessCallback, Action<int, string> onFailureCallback)
         {
             //if (CheckConnectionStatus(onFailureCallback) == false) return;
-            
+
             var commandHandler = _commandHandlers[CommandRequestType.HealthStatusCheckRequest];
             commandHandler.SendCommand(() =>
                 OnHealthCheckStatusSuccessHandler(commandHandler, onSuccessCallback, onFailureCallback));
@@ -87,7 +92,8 @@ namespace Luxodd.Game.Scripts.Network.CommandHandler
                 OnLeaderboardRequestSuccessHandler(commandHandler, onSuccessCallback, onFailureCallback));
         }
 
-        public void SendLevelBeginRequestCommand(int level, Action onSuccessCallback, Action<int, string> onFailureCallback)
+        public void SendLevelBeginRequestCommand(int level, Action onSuccessCallback,
+            Action<int, string> onFailureCallback)
         {
             if (CheckConnectionStatus(onFailureCallback) == false) return;
 
@@ -96,7 +102,8 @@ namespace Luxodd.Game.Scripts.Network.CommandHandler
                 () => OnLevelBeginRequestSuccessHandler(commandHandler, onSuccessCallback, onFailureCallback), level);
         }
 
-        public void SendLevelEndRequestCommand(int level, int score, Action onSuccessCallback, Action<int, string> onFailureCallback)
+        public void SendLevelEndRequestCommand(int level, int score, Action onSuccessCallback,
+            Action<int, string> onFailureCallback)
         {
             if (CheckConnectionStatus(onFailureCallback) == false) return;
 
@@ -110,7 +117,7 @@ namespace Luxodd.Game.Scripts.Network.CommandHandler
             Action<int, string> onFailureCallback)
         {
             //if (CheckConnectionStatus(onFailureCallback) == false) return;
-            
+
             var commandHandler = _commandHandlers[CommandRequestType.GetUserDataRequest];
             commandHandler.SendCommand(() =>
                 OnGetUserDataRequestSuccessHandler(commandHandler, onSuccessCallback, onFailureCallback));
@@ -120,11 +127,42 @@ namespace Luxodd.Game.Scripts.Network.CommandHandler
             Action<int, string> onFailureCallback)
         {
             //if (CheckConnectionStatus(onFailureCallback) == false) return;
-            
+
             var commandHandler = _commandHandlers[CommandRequestType.SetUserDataRequest];
             commandHandler.SendCommand(
                 () => OnSendSetUserDataRequestSuccessHandler(commandHandler, onSuccessCallback, onFailureCallback),
                 userData);
+        }
+
+        public void SendGetGameSessionInfoRequestCommand(Action<SessionInfoPayload> onSuccessCallback,
+            Action<int, string> onFailureCallback)
+        {
+            _commandProcessStateChangeEvent.Notify(CommandProcessState.Sent);
+            
+            var commandHandler = _commandHandlers[CommandRequestType.GetGameSessionInfoRequest];
+            commandHandler.SendCommand(() =>
+                OnSendGetGameSessionInfoRequestSuccessHandler(commandHandler, onSuccessCallback, onFailureCallback));
+        }
+
+        public void SendGetBettingSessionMissionsRequestCommand(Action<BettingSessionMissionsPayload> onSuccessCallback,
+            Action<int, string> onFailureCallback)
+        {
+            _commandProcessStateChangeEvent.Notify(CommandProcessState.Sent);
+            
+            var commandHandler = _commandHandlers[CommandRequestType.GetBettingSessionMissionsRequest];
+            commandHandler.SendCommand(() =>
+                OnSendGetBettingSessionMissionsRequestSuccessHandler(commandHandler, onSuccessCallback,
+                    onFailureCallback));
+        }
+
+        public void SendStrategicBettingResultRequest(List<MissionResultDto> missionResultList,
+            Action onSuccessCallback,
+            Action<int, string> onFailureCallback)
+        {
+            var commandHandler = _commandHandlers[CommandRequestType.SendStrategicBettingResultRequest];
+            commandHandler.SendCommand(
+                () => OnSendStrategicBettingResultRequestSuccessHandler(commandHandler, onSuccessCallback,
+                    onFailureCallback), missionResultList);
         }
 
         private bool CheckConnectionStatus(Action<int, string> onFailureCallback)
@@ -149,7 +187,7 @@ namespace Luxodd.Game.Scripts.Network.CommandHandler
         {
             LoggerHelper.Log(
                 $"[{DateTime.Now}][{GetType().Name}][{nameof(OnProfileResponseHandler)}] OK, status: {handler.ResponseStatus}");
-            
+
             if (handler.ResponseStatus != CommandResponseStatus.Ok)
             {
                 onFailureCallback?.Invoke(handler.StatusCode, handler.ErrorMessage);
@@ -276,7 +314,7 @@ namespace Luxodd.Game.Scripts.Network.CommandHandler
                     $"Send get user data request failed, error: {handler.ErrorMessage}");
                 return;
             }
-            
+
             onSuccessCallback?.Invoke(handler.ResponseHandler.Payload);
         }
 
@@ -286,10 +324,59 @@ namespace Luxodd.Game.Scripts.Network.CommandHandler
             if (handler.ResponseStatus != CommandResponseStatus.Ok)
             {
                 onFailureCallback?.Invoke(handler.StatusCode, handler.ErrorMessage);
-                _errorHandlerService.HandleConnectionError(
+                _errorHandlerService.HandleGameError(
                     $"Send set user data request failed, error: {handler.ErrorMessage}");
                 return;
             }
+
+            onSuccessCallback?.Invoke();
+        }
+
+        private void OnSendGetGameSessionInfoRequestSuccessHandler(BaseCommandHandler handler,
+            Action<SessionInfoPayload> onSuccessCallback, Action<int, string> onFailureCallback)
+        {
+            
+            _commandProcessStateChangeEvent.Notify(CommandProcessState.Received);
+            
+            if (handler.ResponseStatus != CommandResponseStatus.Ok)
+            {
+                onFailureCallback?.Invoke(handler.StatusCode, handler.ErrorMessage);
+                _errorHandlerService.HandleGameError(
+                    $"Send get game session info request failed, error: {handler.ErrorMessage}");
+                return;
+            }
+
+            onSuccessCallback?.Invoke((SessionInfoPayload)handler.ResponseHandler.Payload);
+        }
+
+        private void OnSendGetBettingSessionMissionsRequestSuccessHandler(BaseCommandHandler handler,
+            Action<BettingSessionMissionsPayload> onSuccessCallback, Action<int, string> onFailureCallback)
+        {
+            _commandProcessStateChangeEvent.Notify(CommandProcessState.Received);
+            
+            if (handler.ResponseStatus != CommandResponseStatus.Ok)
+            {
+                onFailureCallback?.Invoke(handler.StatusCode, handler.ErrorMessage);
+                _errorHandlerService.HandleGameError(
+                    $"Send get game session info request failed, error: {handler.ErrorMessage}");
+                return;
+            }
+
+            onSuccessCallback?.Invoke((BettingSessionMissionsPayload)handler.ResponseHandler.Payload);
+        }
+
+        private void OnSendStrategicBettingResultRequestSuccessHandler(BaseCommandHandler handler,
+            Action onSuccessCallback,
+            Action<int, string> onFailureCallback)
+        {
+            if (handler.ResponseStatus != CommandResponseStatus.Ok)
+            {
+                onFailureCallback?.Invoke(handler.StatusCode, handler.ErrorMessage);
+                _errorHandlerService.HandleGameError(
+                    $"Send strategic betting result request failed, error: {handler.ErrorMessage}");
+                return;
+            }
+
             onSuccessCallback?.Invoke();
         }
 

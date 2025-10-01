@@ -1,16 +1,18 @@
 using System;
 using Luxodd.Game.Scripts.HelpersAndUtils.Logger;
 using Luxodd.Game.Scripts.Network.Payloads;
+
 #if NEWTONSOFT_JSON
 using Newtonsoft.Json;
 #endif
+
 using UnityEngine;
 
 namespace Luxodd.Game.Scripts.Network.CommandHandler
 {
-    public class GetUserDataRequestCommandHandler : BaseCommandHandler
+    public class GetBettingSessionMissionsRequestCommandHandler : BaseCommandHandler
     {
-        public GetUserDataRequestCommandHandler(WebSocketService webSocketService) : base(webSocketService)
+        public GetBettingSessionMissionsRequestCommandHandler(WebSocketService webSocketService) : base(webSocketService)
         {
         }
 
@@ -21,38 +23,37 @@ namespace Luxodd.Game.Scripts.Network.CommandHandler
 
             var commandRequest = new CommandRequestJson()
             {
-                Type = nameof(CommandRequestType.GetUserDataRequest),
-                Version = "1.0",
+                Type = nameof(CommandRequestType.GetBettingSessionMissionsRequest)
             };
-
+            
 #if NEWTONSOFT_JSON
             var commandRequestJson = JsonConvert.SerializeObject(commandRequest);
-            commandRequestJson = commandRequestJson.Replace("null", "{}");
 
-            WebSocketService.SendCommand(CommandRequestType.GetUserDataRequest, commandRequestJson,
+            WebSocketService.SendCommand(CommandRequestType.GetBettingSessionMissionsRequest, commandRequestJson,
                 OnCommandResponseSuccessHandler);
 #endif
-            SendStatus = CommandSendStatus.Pending;
         }
 
         protected override void OnCommandResponseSuccessHandler(CommandRequestHandler responseHandler)
         {
             base.OnCommandResponseSuccessHandler(responseHandler);
+            
 #if NEWTONSOFT_JSON
             var payloadJson = JsonConvert.SerializeObject(ResponseHandler.Payload);
-            LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnCommandResponseSuccessHandler)}] OK, payload: {payloadJson}");
-            var payloadObject = JsonConvert.DeserializeObject<UserDataPayload>(payloadJson);
+            LoggerHelper.Log(
+                $"[{DateTime.Now}][{GetType().Name}][{nameof(OnCommandResponseSuccessHandler)}] OK, payload: {payloadJson}");
+
+            var payloadObject = JsonConvert.DeserializeObject<BettingSessionMissionsPayload>(payloadJson);
             if (payloadObject != null)
             {
-                LoggerHelper.Log(
-                    $"[{DateTime.Now}][{GetType().Name}][{nameof(OnCommandResponseSuccessHandler)}] OK, payloadObject: {payloadObject.Data}");
+                Debug.Log(
+                    $"[{DateTime.Now}][{GetType().Name}][{nameof(OnCommandResponseSuccessHandler)}] OK, session type: {payloadObject.SessionId}");
             }
 
             ResponseHandler.Payload = payloadObject;
 #endif
-
-            _onCommandCompletedCallback?.Invoke();
             
+            _onCommandCompletedCallback?.Invoke();
         }
     }
 }

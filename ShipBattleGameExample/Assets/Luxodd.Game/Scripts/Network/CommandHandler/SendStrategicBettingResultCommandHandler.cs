@@ -1,41 +1,52 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using Luxodd.Game.Scripts.Missions;
 using Luxodd.Game.Scripts.Network.Payloads;
+
 #if NEWTONSOFT_JSON
 using Newtonsoft.Json;
 #endif
 
 namespace Luxodd.Game.Scripts.Network.CommandHandler
 {
-    public class GetUserProfileRequestCommandHandler : BaseCommandHandler
+    public class SendStrategicBettingResultCommandHandler : BaseCommandHandler
     {
-        public GetUserProfileRequestCommandHandler(WebSocketService webSocketService) : base(webSocketService)
+        public SendStrategicBettingResultCommandHandler(WebSocketService webSocketService) : base(webSocketService)
         {
         }
 
         public override void SendCommand(Action onCommandComplete, params object[] parameters)
         {
             _onCommandCompletedCallback = onCommandComplete;
+            
+            var missionsResults = parameters[0] as List<MissionResultDto>;
+
+            var strategicBettingResult = new StrategicBettingResultPayload()
+            {
+                Results = missionsResults,
+            };
+
             var commandRequest = new CommandRequestJson()
             {
-                Type = CommandRequestType.GetProfileRequest.ToString()
+                Type = nameof(CommandRequestType.SendStrategicBettingResultRequest),
+                Version = "1.0",
+                Payload = strategicBettingResult
             };
+            
 #if NEWTONSOFT_JSON
+            
             var commandRequestJson = JsonConvert.SerializeObject(commandRequest);
-            WebSocketService.SendCommand(CommandRequestType.GetProfileRequest, commandRequestJson,
+            WebSocketService.SendCommand(CommandRequestType.SetUserDataRequest, commandRequestJson,
                 OnCommandResponseSuccessHandler);
-            #endif
+#endif
+            
             SendStatus = CommandSendStatus.Pending;
         }
 
         protected override void OnCommandResponseSuccessHandler(CommandRequestHandler responseHandler)
         {
             base.OnCommandResponseSuccessHandler(responseHandler);
-#if NEWTONSOFT_JSON
-            var payloadJson = JsonConvert.SerializeObject(ResponseHandler.Payload);
-            var payloadObject = JsonConvert.DeserializeObject<ProfilePayload>(payloadJson);
-            ResponseHandler.Payload = payloadObject;
-            #endif
-
+            
             _onCommandCompletedCallback?.Invoke();
         }
     }

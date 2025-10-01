@@ -7,13 +7,13 @@ namespace Game.UI.Handlers
 {
     public class GameOverWindowHandler : MonoBehaviour
     {
-        private const string YesButtonKey = "Yes";
-        private const string NoButtonKey = "No";
+        private const string RestartButtonKey = "Restart";
+        private const string NextButtonKey = "Next";
 
         private IGameOverWindowView _gameOverWindowView;
 
-        private Action _yesButtonClickCallback;
-        private Action _noButtonClickCallback;
+        private Action _restartButtonClickCallback;
+        private Action _nextButtonClickCallback;
 
         private int _counter = 0;
 
@@ -33,16 +33,16 @@ namespace Game.UI.Handlers
             _gameOverWindowView.Hide();
         }
 
-        public void SetYesButtonCallback(System.Action callback)
+        public void SetRestartButtonCallback(System.Action callback)
         {
-            _yesButtonClickCallback = callback;
-            _gameOverWindowView.SetYesButtonClickedHandler(OnYesButtonClickHandler);
+            _restartButtonClickCallback = callback;
+            _gameOverWindowView.SetRestartButtonClickedHandler(OnRestartButtonClickHandler);
         }
 
-        public void SetNoButtonCallback(System.Action callback)
+        public void SetNextButtonCallback(System.Action callback)
         {
-            _noButtonClickCallback = callback;
-            _gameOverWindowView.SetNoButtonClickedHandler(OnNoButtonClickHandler);
+            _nextButtonClickCallback = callback;
+            _gameOverWindowView.SetNextButtonClickedHandler(OnNextButtonClickHandler);
         }
 
         public void SetCreditsCount(int creditsCount)
@@ -77,35 +77,45 @@ namespace Game.UI.Handlers
             _gameOverWindowView.KeyboardNavigator.SetFocus(isFocused);
         }
 
+        public void SetRestartView()
+        {
+            _gameOverWindowView.SetRestartView();
+        }
+
+        public void SetNextView()
+        {
+            _gameOverWindowView.SetNextView();
+        }
+
         private void OnVirtualKeyboardKeySubmit(string stringValue)
         {
             switch (stringValue)
             {
-                case YesButtonKey:
-                    OnYesButtonClickHandler();
+                case RestartButtonKey:
+                    OnRestartButtonClickHandler();
                     break;
-                case NoButtonKey:
-                    OnNoButtonClickHandler();
+                case NextButtonKey:
+                    OnNextButtonClickHandler();
                     break;
             }
         }
 
-        private void OnYesButtonClickHandler()
+        private void OnRestartButtonClickHandler()
         {
             if (_counter > 0) return;
 
             _counter++;
-            _yesButtonClickCallback?.Invoke();
+            _restartButtonClickCallback?.Invoke();
 
             CoroutineManager.NextFrameAction(3, () => _counter = 0);
         }
 
-        private void OnNoButtonClickHandler()
+        private void OnNextButtonClickHandler()
         {
             if (_counter > 0) return;
 
             _counter++;
-            _noButtonClickCallback?.Invoke();
+            _nextButtonClickCallback?.Invoke();
 
             CoroutineManager.NextFrameAction(3, () => _counter = 0);
         }

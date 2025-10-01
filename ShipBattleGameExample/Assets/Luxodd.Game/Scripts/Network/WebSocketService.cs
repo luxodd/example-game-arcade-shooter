@@ -29,10 +29,9 @@ namespace Luxodd.Game.Scripts.Network
         [SerializeField] private FetchUrlQueryString _fetchUrlQueryString = null;
 
         [SerializeField] private float _secondsBeforeError = 4f;
-        
+
         //for test purpose
-        [Header("For Test")]
-        [SerializeField] private float _timeBeforeReconnect = 3f;
+        [Header("For Test")] [SerializeField] private float _timeBeforeReconnect = 3f;
 
         private ClientWebSocket _clientWebSocket;
         private bool _isConnected;
@@ -46,9 +45,11 @@ namespace Luxodd.Game.Scripts.Network
         private Action _onConnectedCallback;
         private Action _onConnectionErrorCallback;
 
+        private Action<SessionOptionAction> _onSessionOptionCallback;
+
         private Dictionary<CommandRequestType, Queue<CommandRequestHandler>> _commandRequestHandlers =
             new Dictionary<CommandRequestType, Queue<CommandRequestHandler>>();
-        
+
         private Queue<SendCommandData> _sendCommandDataQueue = new Queue<SendCommandData>();
 
         public void ConnectToServer(Action onSuccessCallback = null, Action onErrorCallback = null)
@@ -63,8 +64,9 @@ namespace Luxodd.Game.Scripts.Network
             _isConnected = false;
 #if !UNITY_EDITOR
             _socketLibraryWrapper.CloseWebSocketConnection();
-#else      
-            _clientWebSocket?.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close Application", CancellationToken.None)?.Wait();
+#else
+            _clientWebSocket
+                ?.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close Application", CancellationToken.None)?.Wait();
 #endif
         }
 
@@ -74,13 +76,41 @@ namespace Luxodd.Game.Scripts.Network
                 $"[{DateTime.Now}][{GetType().Name}][{nameof(BackToSystemWithError)}] OK, message: {message}, error: {error}");
             _socketLibraryWrapper.NotifySessionEnd();
         }
-        
+
         public void BackToSystem()
         {
             LoggerHelper.Log(
                 $"[{DateTime.Now}][{GetType().Name}][{nameof(BackToSystem)}] OK");
             _socketLibraryWrapper.NotifySessionEnd();
-        } 
+        }
+
+        public void SendSessionOptionRestart(Action<SessionOptionAction> callback)
+        {
+            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(SendSessionOptionRestart)}] OK");
+            _onSessionOptionCallback = callback;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _socketLibraryWrapper.SendSessionOptionsRestart();
+#endif
+        }
+
+        public void SendSessionOptionContinue(Action<SessionOptionAction> callback)
+        {
+            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(SendSessionOptionContinue)}] OK");
+            _onSessionOptionCallback = callback;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _socketLibraryWrapper.SendSessionOptionsContinue();
+#endif
+        }
+
+        public void SendSessionOptionEnd(Action<SessionOptionAction> callback)
+        {
+            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(SendSessionOptionEnd)}] OK");
+
+            _onSessionOptionCallback = callback;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _socketLibraryWrapper.SendSessionOptionsEnd();
+#endif
+        }
 
         public void SendCommand(CommandRequestType commandRequestType, string commandRequestJson,
             Action<CommandRequestHandler> onSuccess)
@@ -88,18 +118,18 @@ namespace Luxodd.Game.Scripts.Network
             Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(SendCommand)}] OK, _isConnected: {_isConnected}");
             if (_isConnected)
             {
-                ProcessCommandInner(commandRequestType, commandRequestJson, onSuccess); 
+                ProcessCommandInner(commandRequestType, commandRequestJson, onSuccess);
             }
             else
             {
                 AddCommandToDispatch(commandRequestType, commandRequestJson, onSuccess);
-                
+
                 if (_wasConnected && _isInReconnection == false)
                 {
                     StartCoroutine(WaitForConnection());
                 }
             }
-            
+
         }
 
         private void Awake()
@@ -118,6 +148,8 @@ namespace Luxodd.Game.Scripts.Network
             _socketLibraryWrapper.WebSocketConnectionErrorEvent.AddListener(OnWebSocketConnectionErrorHandler);
             _socketLibraryWrapper.WebSocketClosedEvent.AddListener(OnWebSocketClosedHandler);
             _socketLibraryWrapper.MessageReceivedEvent.AddListener(OnMessageReceived);
+            
+            _socketLibraryWrapper.OnSessionOptionAction.AddListener(OnSessionOptionsCallback);
         }
 
         private void ProcessCommandInner(CommandRequestType commandRequestType, string commandRequestJson,
@@ -129,7 +161,8 @@ namespace Luxodd.Game.Scripts.Network
 
         private void OnWebSocketConnectionErrorHandler(string error)
         {
-            LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnWebSocketConnectionErrorHandler)}] OK, error:{error}");
+            LoggerHelper.Log(
+                $"[{DateTime.Now}][{GetType().Name}][{nameof(OnWebSocketConnectionErrorHandler)}] OK, error:{error}");
             _isConnected = false;
         }
 
@@ -146,7 +179,7 @@ namespace Luxodd.Game.Scripts.Network
             _socketLibraryWrapper.WebSocketClosedEvent.RemoveListener(OnWebSocketClosedHandler);
             _socketLibraryWrapper.MessageReceivedEvent.RemoveListener(OnMessageReceived);
         }
-        
+
         private string GetSessionToken()
         {
             var isDebug = false;
@@ -169,7 +202,7 @@ namespace Luxodd.Game.Scripts.Network
 
             var serverUrl = isDebug == false
                 ? $"{_settingsDescriptor.ServerAddress}?token={_fetchUrlQueryString.Token}"
-                : $"{_settingsDescriptor.ServerAddress}?token={_settingsDescriptor.DeveloperDebugToken}"; 
+                : $"{_settingsDescriptor.ServerAddress}?token={_settingsDescriptor.DeveloperDebugToken}";
 
             var websocketUri =
                 new Uri(serverUrl);
@@ -249,11 +282,12 @@ namespace Luxodd.Game.Scripts.Network
                                 $"[{DateTime.Now}][{GetType().Name}][{nameof(ReceiveMessage)}] OK, received message: {receivedMessage}");
                             OnMessageReceived(receivedMessage);
                             //UnityMainThread.Worker.AddJob(() => _successCallback?.Invoke(receivedMessage));
-                            
+
                             break;
                         }
                         case WebSocketMessageType.Close:
-                            LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(ReceiveMessage)}] OK, closed");
+                            LoggerHelper.Log(
+                                $"[{DateTime.Now}][{GetType().Name}][{nameof(ReceiveMessage)}] OK, closed");
                             await _clientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing",
                                 CancellationToken.None);
                             break;
@@ -283,7 +317,8 @@ namespace Luxodd.Game.Scripts.Network
             var messageBytes = Encoding.UTF8.GetBytes(message);
             await _clientWebSocket.SendAsync(new ArraySegment<byte>(messageBytes), WebSocketMessageType.Text, true,
                 CancellationToken.None);
-            LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(SendMessageWebsocket)}] OK, message sent: {message}");
+            LoggerHelper.Log(
+                $"[{DateTime.Now}][{GetType().Name}][{nameof(SendMessageWebsocket)}] OK, message sent: {message}");
         }
 
         private async void SendEventInner(string commandRequestRaw)
@@ -372,9 +407,9 @@ namespace Luxodd.Game.Scripts.Network
                 LoggerHelper.LogError(
                     $"[{DateTime.Now}][{GetType().Name}][{nameof(HandleMessageReceived)}] Error: Message: {message}, did not contain any command");
             }
-            #endif
+#endif
         }
-        
+
         //if connected - OK
         //if was connected and now disconnected - add to query
         //if was disconnected and now connected
@@ -384,17 +419,18 @@ namespace Luxodd.Game.Scripts.Network
             Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(WaitForConnection)}] OK");
             _isInReconnection = true;
             var deadline = Time.time + _secondsBeforeError;
-            
+
             while (_isConnected == false && Time.time < deadline)
             {
                 yield return new WaitForSeconds(0.3f);
             }
-            
+
             _isInReconnection = false;
 
-            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(WaitForConnection)}] OK, _isConnected={_isConnected}");
-            
-            if (_isConnected&&_isInFlushing == false)
+            Debug.Log(
+                $"[{DateTime.Now}][{GetType().Name}][{nameof(WaitForConnection)}] OK, _isConnected={_isConnected}");
+
+            if (_isConnected && _isInFlushing == false)
             {
                 // flush dispatched commands
                 StartCoroutine(FlushCommands());
@@ -402,20 +438,23 @@ namespace Luxodd.Game.Scripts.Network
             else if (Time.time >= deadline)
             {
                 // connection error - go back to the system 
-                BackToSystemWithError("Can't connect to server","Connection error");
+                BackToSystemWithError("Can't connect to server", "Connection error");
             }
         }
 
         private IEnumerator FlushCommands()
         {
-            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(FlushCommands)}] OK, total commands: {_sendCommandDataQueue.Count}");
+            Debug.Log(
+                $"[{DateTime.Now}][{GetType().Name}][{nameof(FlushCommands)}] OK, total commands: {_sendCommandDataQueue.Count}");
             _isInFlushing = true;
             while (_sendCommandDataQueue.Count > 0)
             {
                 var command = _sendCommandDataQueue.Dequeue();
-                ProcessCommandInner(command.CommandRequestType, command.CommandRequestJson, command.OnCommandResponseSuccessHandler);
+                ProcessCommandInner(command.CommandRequestType, command.CommandRequestJson,
+                    command.OnCommandResponseSuccessHandler);
                 yield return new WaitForSeconds(0.3f);
             }
+
             _isInFlushing = false;
         }
 
@@ -438,15 +477,20 @@ namespace Luxodd.Game.Scripts.Network
         private void TestCloseConnectionAndReconnect()
         {
             CloseConnection();
-            
+
             CoroutineManager.DelayedAction(_timeBeforeReconnect, () => ConnectToServer());
         }
-    }
 
-    public class SendCommandData
-    {
-        public CommandRequestType CommandRequestType { get; set; }
-        public string CommandRequestJson { get; set; }
-        public Action<CommandRequestHandler> OnCommandResponseSuccessHandler { get; set; }
+        private void OnSessionOptionsCallback(SessionOptionAction action)
+        {
+            _onSessionOptionCallback?.Invoke(action);
+        }
+
+        public class SendCommandData
+        {
+            public CommandRequestType CommandRequestType { get; set; }
+            public string CommandRequestJson { get; set; }
+            public Action<CommandRequestHandler> OnCommandResponseSuccessHandler { get; set; }
+        }
     }
 }

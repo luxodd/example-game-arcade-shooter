@@ -1,5 +1,6 @@
 ﻿using System;
 using Luxodd.Game.Scripts.HelpersAndUtils;
+using Luxodd.Game.Scripts.Network.Payloads;
 #if NEWTONSOFT_JSON
 using Newtonsoft.Json;
 #endif

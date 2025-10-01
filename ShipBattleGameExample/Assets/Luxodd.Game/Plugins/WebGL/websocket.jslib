@@ -74,5 +74,15 @@ mergeInto(LibraryManager.library, {
         window.parent.postMessage({
             type: "session_end"
         }, "*");
+    },
+	
+	SendSessionOptionsMessageWithAction: function (actionPtr) {
+        var action = UTF8ToString(actionPtr);
+        if (!action) {
+            console.warn("SendSessionOptionsMessageWithAction: empty action");
+            return;
+        }
+        console.log("Sending session_options with action:", action);
+        window.parent.postMessage({ type: "session_options", action: action }, "*");
     }
 });
