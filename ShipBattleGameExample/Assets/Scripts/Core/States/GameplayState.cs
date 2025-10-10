@@ -255,6 +255,13 @@ namespace Core.States
             Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(TestCancelSessionCallback)}] OK");
             OnSessionOptionContinueCallback(SessionOptionAction.Cancel);
         }
+        
+        [ContextMenu("Test Cancel Session")]
+        private void TestEndSessionCallback()
+        {
+            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(TestEndSessionCallback)}] OK");
+            OnSessionOptionContinueCallback(SessionOptionAction.End);
+        }
 
         private void OnSessionOptionContinueCallback(SessionOptionAction sessionOptionAction)
         {
@@ -270,6 +277,7 @@ namespace Core.States
                     OnContinueGameChargeSuccessHandler();
                     break;
                 case SessionOptionAction.End:
+                    OnContinueGameEndChoiceHandler();
                     break;
                 case SessionOptionAction.Cancel:
                     _gameOverWindowHandler.SetNextView();
@@ -320,6 +328,24 @@ namespace Core.States
             _continueGameWindowHandler.ShowContinueGameWindow();
         }
 
+        private void OnContinueGameEndChoiceHandler()
+        {
+            EventAggregator.Post(this,
+                new GameOverEvent() { CurrentLevelPosition = _cameraFollowBehaviour.CurrentPosition });
+            
+            PrepareAndSendLevelStatistics();
+            
+            _gameOverWindowHandler.HideGameOverWindow();
+            _gameScreenHandler.HideGameScreen();
+            
+#if !UNITY_EDITOR
+            _webSocketService.BackToSystem();
+#else
+            CompleteState(ApplicationState.BackToMainMenu);
+#endif
+            
+        }
+
         private void PrepareAndShowGameOverWindow()
         {
             //prepare statistics
@@ -331,14 +357,32 @@ namespace Core.States
             _scoreManager.RecordResult();
             _playerStatisticTrackingController.StopTracking();
 
+            var levelStatisticData = PrepareAndSendLevelStatistics();
+
+            var differenceResult = _leaderboardService.CompareLevelStatisticData(levelStatisticData);
+
+            if (differenceResult != null)
+            {
+                var phrase = differenceResult.Item2;
+                var differenceData = differenceResult.Item1;
+                _gameOverWindowHandler.SetDifferenceData(differenceData.TotalScore, differenceData.EnemiesKilled,
+                    differenceData.Accuracy, differenceData.LevelProgress, differenceData.TimeInSeconds);
+                _gameOverWindowHandler.SetMotivatedPhrase(phrase);
+            }
+            
+            _gameOverWindowHandler.ShowGameOverWindow();
+        }
+
+        private LevelStatisticData PrepareAndSendLevelStatistics()
+        {
+            _scoreManager.RecordResult();
+            _playerStatisticTrackingController.StopTracking();
+
             var levelStatisticData = LevelStatisticData.Create(_scoreManager.Score.Value,
                 _playerStatisticTrackingController.EnemiesKilled,
                 _playerStatisticTrackingController.Accuracy,
                 _playerStatisticTrackingController.LevelProgress,
                 _playerStatisticTrackingController.TotalSeconds, DateTime.Now);
-
-            _gameOverWindowHandler.SetGameResultData(levelStatisticData.TotalScore, levelStatisticData.EnemiesKilled,
-                levelStatisticData.Accuracy, levelStatisticData.LevelProgress, levelStatisticData.TimeInSeconds);
 
             var differenceResult = _leaderboardService.CompareLevelStatisticData(levelStatisticData);
 
@@ -356,7 +400,7 @@ namespace Core.States
             _webSocketCommandHandler.SendLevelEndRequestCommand(_playerBehaviour.CurrentLevel,
                 levelStatisticData.TotalScore, OnLevelEndRequestSuccessHandler, OnLevelEndRequestFailureHandler);
             
-            _gameOverWindowHandler.ShowGameOverWindow();
+            return levelStatisticData;
         }
 
         private void OnSessionOptionRestartButtonClickHandler(SessionOptionAction sessionOptionAction)

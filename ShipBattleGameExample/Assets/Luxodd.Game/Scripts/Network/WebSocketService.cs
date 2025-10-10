@@ -196,13 +196,18 @@ namespace Luxodd.Game.Scripts.Network
             await Task.Yield();
 
             var isDebug = false;
+            var serverUrlRaw = _settingsDescriptor.ServerAddress;
+            if (string.IsNullOrEmpty(serverUrlRaw))
+            {
+                serverUrlRaw = _fetchUrlQueryString.WSUrl;
+            }
 #if UNITY_EDITOR
             isDebug = true;
 #endif
 
             var serverUrl = isDebug == false
-                ? $"{_settingsDescriptor.ServerAddress}?token={_fetchUrlQueryString.Token}"
-                : $"{_settingsDescriptor.ServerAddress}?token={_settingsDescriptor.DeveloperDebugToken}";
+                ? $"{serverUrlRaw}?token={_fetchUrlQueryString.Token}"
+                : $"{serverUrlRaw}?token={_settingsDescriptor.DeveloperDebugToken}";
 
             var websocketUri =
                 new Uri(serverUrl);
