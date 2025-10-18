@@ -120,6 +120,7 @@ namespace Core.States
 
         private void SetupDefaultGameSettings()
         {
+            Application.runInBackground = true;
             _audioManager.SetupMusicDefaultVolume(_defaultGameSettings.MusicVolume);
             _audioManager.SetupSfxDefaultVolume(_defaultGameSettings.SfxVolume);
             _walletService.SetCredits(_defaultGameSettings.CreditsCount);
