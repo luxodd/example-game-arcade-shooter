@@ -120,10 +120,13 @@ namespace Core.States
 
         private void SetupDefaultGameSettings()
         {
-            Application.runInBackground = true;
             _audioManager.SetupMusicDefaultVolume(_defaultGameSettings.MusicVolume);
             _audioManager.SetupSfxDefaultVolume(_defaultGameSettings.SfxVolume);
             _walletService.SetCredits(_defaultGameSettings.CreditsCount);
+            
+            Application.targetFrameRate = 60;
+            Application.runInBackground = true;
+            Application.backgroundLoadingPriority = ThreadPriority.Low;
         }
 
         private void OnConnectedToServerSuccessHandler()

@@ -230,9 +230,22 @@ namespace Core.States
 
         #region UI Handlers
 
+        [ContextMenu("Test Game Over")]
+        private void TestGameOver()
+        {
+            DeactivateGameplayProcess();
+
+            PrepareAndShowContinueGameWindow();
+        }
+        
         private void PrepareAndShowContinueGameWindow()
         {
-            _webSocketService.SendSessionOptionContinue(OnSessionOptionContinueCallback);
+            _continueGameWindowHandler.SetContinueButtonClickCallback(OnContinueGameWindowContinueButtonClickHandler);
+            _continueGameWindowHandler.SetCancelButtonClickCallback(OnContinueGameWindowCancelButtonClickHandler);
+            
+            _continueGameWindowHandler.ShowContinueGameWindow();
+            
+            //_webSocketService.SendSessionOptionContinue(OnSessionOptionContinueCallback);
         }
 
         [ContextMenu("Test Continue Session")]
@@ -294,6 +307,8 @@ namespace Core.States
             LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnContinueGameWindowCancelButtonClickHandler)}] OK");
             _continueGameWindowHandler.HideContinueGameWindow();
 
+            _gameOverWindowHandler.SetRestartView();
+            _gameOverWindowHandler.SetRestartButtonCallback(RestartGame);
             PrepareAndShowGameOverWindow();
         }
 
@@ -303,11 +318,13 @@ namespace Core.States
                 $"[{DateTime.Now}][{GetType().Name}][{nameof(OnContinueGameWindowContinueButtonClickHandler)}] OK");
             _continueGameWindowHandler.HideContinueGameWindow();
 
-            _spendCreditsCase.SpendCredits(_defaultGameSettings.CreditsForContinueGame,
-                OnContinueGameChargeSuccessHandler,
-                OnContinueGameChargeSuccessHandler,
-                OnContinueGameChargeCancelHandler,
-                OnContinueGameChargeFailureHandler);
+            // _spendCreditsCase.SpendCredits(_defaultGameSettings.CreditsForContinueGame,
+            //     OnContinueGameChargeSuccessHandler,
+            //     OnContinueGameChargeSuccessHandler,
+            //     OnContinueGameChargeCancelHandler,
+            //     OnContinueGameChargeFailureHandler);
+            
+            _webSocketService.SendSessionOptionContinue(OnSessionOptionContinueCallback);
         }
 
         private void OnContinueGameChargeSuccessHandler()
@@ -405,10 +422,11 @@ namespace Core.States
 
         private void OnSessionOptionRestartButtonClickHandler(SessionOptionAction sessionOptionAction)
         {
+            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnSessionOptionRestartButtonClickHandler)}] OK");
             switch (sessionOptionAction)
             {
                 case SessionOptionAction.Restart:
-                    RestartGame();
+                    ApplyRestartGame();
                     break;
                 case SessionOptionAction.Continue:
                     break;
@@ -421,11 +439,11 @@ namespace Core.States
 
         private void OnGameOverWindowYesButtonClickHandler()
         {
-            _gameOverWindowHandler.SetKeyboardNavigatorFocused(false);
-            _spendCreditsCase.SpendCredits(_defaultGameSettings.CreditsForGame, RestartGame,
-                OnGameOverWindowCreditsChargeSuccessHandler,
-                OnGameOverWindowCreditsChargeCancelHandler,
-                OnGameOverWindowCreditsChargeFailureHandler);
+            // _gameOverWindowHandler.SetKeyboardNavigatorFocused(false);
+            // _spendCreditsCase.SpendCredits(_defaultGameSettings.CreditsForGame, RestartGame,
+            //     OnGameOverWindowCreditsChargeSuccessHandler,
+            //     OnGameOverWindowCreditsChargeCancelHandler,
+            //     OnGameOverWindowCreditsChargeFailureHandler);
         }
 
         private void OnGameOverWindowCreditsChargeSuccessHandler()
@@ -458,6 +476,13 @@ namespace Core.States
         private void RestartGame()
         {
             LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(RestartGame)}] OK");
+            _webSocketService.SendSessionOptionRestart(OnSessionOptionRestartButtonClickHandler);
+            
+            
+        }
+
+        private void ApplyRestartGame()
+        {
             _gameOverWindowHandler.HideGameOverWindow();
             _gameScreenHandler.HideGameScreen();
             CompleteState(ApplicationState.RestartGame);

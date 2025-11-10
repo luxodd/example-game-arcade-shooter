@@ -110,6 +110,8 @@ MonoBehaviour:
   _navigableItems:
   - {fileID: 703777273666403658}
   - {fileID: 5254725151758424216}
+  _useConcreteSelection: 0
+  _selectedItem: {fileID: 0}
   _navigationType: 2
   _itemsInRow: 0
   _keyForButtonSubmitJoystick: 330
@@ -428,7 +430,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Do you want to continue game for {0} credits?
+  m_text: Do you want to continue game?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5c4138fdaa681e0499f495e9a054c5eb, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 7384f08f95ccb904cbc20908d1752bb8, type: 2}
