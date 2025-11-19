@@ -289,10 +289,10 @@ namespace Core.States
                 case SessionOptionAction.Continue:
                     OnContinueGameChargeSuccessHandler();
                     break;
+                // case SessionOptionAction.End:
+                //     OnContinueGameEndChoiceHandler();
+                //     break;
                 case SessionOptionAction.End:
-                    OnContinueGameEndChoiceHandler();
-                    break;
-                case SessionOptionAction.Cancel:
                     _gameOverWindowHandler.SetNextView();
                     _gameOverWindowHandler.SetNextButtonCallback(OnGameOverWindowNoButtonClickHandler);
                     PrepareAndShowGameOverWindow();
@@ -317,12 +317,6 @@ namespace Core.States
             LoggerHelper.Log(
                 $"[{DateTime.Now}][{GetType().Name}][{nameof(OnContinueGameWindowContinueButtonClickHandler)}] OK");
             _continueGameWindowHandler.HideContinueGameWindow();
-
-            // _spendCreditsCase.SpendCredits(_defaultGameSettings.CreditsForContinueGame,
-            //     OnContinueGameChargeSuccessHandler,
-            //     OnContinueGameChargeSuccessHandler,
-            //     OnContinueGameChargeCancelHandler,
-            //     OnContinueGameChargeFailureHandler);
             
             _webSocketService.SendSessionOptionContinue(OnSessionOptionContinueCallback);
         }
@@ -422,7 +416,7 @@ namespace Core.States
 
         private void OnSessionOptionRestartButtonClickHandler(SessionOptionAction sessionOptionAction)
         {
-            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnSessionOptionRestartButtonClickHandler)}] OK");
+            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnSessionOptionRestartButtonClickHandler)}] OK, SessionOptionAction:{sessionOptionAction}");
             switch (sessionOptionAction)
             {
                 case SessionOptionAction.Restart:
@@ -431,6 +425,8 @@ namespace Core.States
                 case SessionOptionAction.Continue:
                     break;
                 case SessionOptionAction.End:
+                    Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnSessionOptionRestartButtonClickHandler)}] OK, End was selected, going back to system");
+                    _webSocketService.BackToSystem();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(sessionOptionAction), sessionOptionAction, null);
