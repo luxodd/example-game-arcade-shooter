@@ -416,7 +416,7 @@ namespace Core.States
 
         private void OnSessionOptionRestartButtonClickHandler(SessionOptionAction sessionOptionAction)
         {
-            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnSessionOptionRestartButtonClickHandler)}] OK, SessionOptionAction:{sessionOptionAction}");
+            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnSessionOptionRestartButtonClickHandler)}] OK");
             switch (sessionOptionAction)
             {
                 case SessionOptionAction.Restart:
@@ -425,7 +425,6 @@ namespace Core.States
                 case SessionOptionAction.Continue:
                     break;
                 case SessionOptionAction.End:
-                    Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnSessionOptionRestartButtonClickHandler)}] OK, End was selected, going back to system");
                     _webSocketService.BackToSystem();
                     break;
                 default:

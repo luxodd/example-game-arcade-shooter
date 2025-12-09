@@ -46,6 +46,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isLogsEnabled: 1
   _isWarningsEnabled: 1
+--- !u!1 &890428930262741334
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6095176687592549723}
+  - component: {fileID: 918081255677767369}
+  m_Layer: 0
+  m_Name: LuxoddSessionBridge
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6095176687592549723
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 890428930262741334}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1193278128809462904}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &918081255677767369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 890428930262741334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e621acb0fbaa0a4ca152d746c90dde0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Luxodd.Game.Scripts.Network.LuxoddSessionBridge
 --- !u!1 &1537901441073397439
 GameObject:
   m_ObjectHideFlags: 0
@@ -83,6 +127,9 @@ Transform:
   - {fileID: 3232364091030915428}
   - {fileID: 483664850197205337}
   - {fileID: 924663179244636780}
+  - {fileID: 3765249568469845685}
+  - {fileID: 6095176687592549723}
+  - {fileID: 4929295663302122597}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2553146603025829048
@@ -316,6 +363,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _webSocketService: {fileID: 2167794167631596363}
   _errorHandlerService: {fileID: 3867343812447135476}
+--- !u!1 &4190452331065778025
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3765249568469845685}
+  - component: {fileID: 730026364888505446}
+  m_Layer: 0
+  m_Name: WebGlHostWrapper
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3765249568469845685
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4190452331065778025}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1193278128809462904}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &730026364888505446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4190452331065778025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ee4005c48a02934cafe127cf3cd2058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Luxodd.Game.Scripts.Network.WebGlHostWrapper
 --- !u!1 &4324231572371504051
 GameObject:
   m_ObjectHideFlags: 0
@@ -408,6 +499,7 @@ MonoBehaviour:
   _settingsDescriptor: {fileID: 11400000, guid: 812e5b8ce30ed7243a0a011dafba8c9a, type: 2}
   _socketLibraryWrapper: {fileID: 6774978345548687132}
   _fetchUrlQueryString: {fileID: 6150350332265116626}
+  _webGlHostWrapper: {fileID: 730026364888505446}
   _secondsBeforeError: 6
   _timeBeforeReconnect: 3
 --- !u!114 &6504260046023792254
@@ -422,3 +514,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6af4ad9bae67434e9cbe66082dfc8b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &8280548221599501944
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4929295663302122597}
+  - component: {fileID: 3053766193483824790}
+  m_Layer: 0
+  m_Name: SessionFlowController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4929295663302122597
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8280548221599501944}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1193278128809462904}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3053766193483824790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8280548221599501944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bf2b13db370a8e488e9595fa7d7c127, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Luxodd.Game.Scripts.Network.SessionFlowController
+  _waitTimeoutSeconds: 5
+  _sessionBridge: {fileID: 918081255677767369}
+  _socketService: {fileID: 2167794167631596363}

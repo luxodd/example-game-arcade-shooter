@@ -47,6 +47,7 @@ namespace Core.States
         [SerializeField] private NumericKeyboardPopupHandler _numericKeyboardPopupHandler;
         [SerializeField] private CompletedDemoWindowHandler _completedDemoWindowHandler;
         [SerializeField] private ReplayLevelWindowHandler _replayLevelWindowHandler;
+        [SerializeField] private SessionFlowController _sessionFlowController;
         
         [Header("For Debugging")]
         [SerializeField] private bool _needToConnectToServer = true;
@@ -58,8 +59,10 @@ namespace Core.States
             LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnStateEnter)}] OK");
             if (_needToConnectToServer)
             {
-                _webSocketService.ConnectToServer(OnConnectedToServerSuccessHandler,
-                    () => OnConnectedToServerFailureHandler(-1,null));
+                // _webSocketService.ConnectToServer(OnConnectedToServerSuccessHandler,
+                //     () => OnConnectedToServerFailureHandler(-1,null));
+                
+                _sessionFlowController.ActivateProcess(OnConnectedToServerSuccessHandler, ()=> OnConnectedToServerFailureHandler(-1, null));
             }
 
             var loadingScreenView = _uiManager.ProvideView<ILoadingScreenView>(ViewType.LoadingScreen);
@@ -132,9 +135,6 @@ namespace Core.States
         private void OnConnectedToServerSuccessHandler()
         {
             LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnConnectedToServerSuccessHandler)}] OK");
-            
-            _websocketCommandHandler.SendProfileRequestCommand(OnProfileRequestSuccessHandler, OnProfileRequestFailureHandler);
-            _websocketCommandHandler.SendUserBalanceRequestCommand(OnUserBalanceRequestSuccessHandler, OnUserBalanceRequestFailureHandler);
             
             _leaderboardService.PullLastLeaderboardData(
                 ()=> _leaderboardWindowHandler.PrepareLeaderboardEntries(_leaderboardService.LeaderboardData),

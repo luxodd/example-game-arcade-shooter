@@ -27,6 +27,7 @@ namespace Luxodd.Game.Scripts.Network
         [SerializeField] private WebSocketLibraryWrapper _socketLibraryWrapper = null;
 
         [SerializeField] private FetchUrlQueryString _fetchUrlQueryString = null;
+        [SerializeField] private WebGlHostWrapper _webGlHostWrapper = null;
 
         [SerializeField] private float _secondsBeforeError = 4f;
 
@@ -51,9 +52,18 @@ namespace Luxodd.Game.Scripts.Network
             new Dictionary<CommandRequestType, Queue<CommandRequestHandler>>();
 
         private Queue<SendCommandData> _sendCommandDataQueue = new Queue<SendCommandData>();
+        private LuxoddSessionPayload _sessionPayload;
 
         public void ConnectToServer(Action onSuccessCallback = null, Action onErrorCallback = null)
         {
+            _onConnectedCallback = onSuccessCallback;
+            _onConnectionErrorCallback = onErrorCallback;
+            _ = StartConnectionAsync();
+        }
+
+        internal void ConnectToServer(LuxoddSessionPayload sessionPayload, Action onSuccessCallback = null, Action onErrorCallback = null)
+        {
+            _sessionPayload = sessionPayload;
             _onConnectedCallback = onSuccessCallback;
             _onConnectionErrorCallback = onErrorCallback;
             _ = StartConnectionAsync();
@@ -205,9 +215,25 @@ namespace Luxodd.Game.Scripts.Network
             isDebug = true;
 #endif
 
-            var serverUrl = isDebug == false
-                ? $"{serverUrlRaw}?token={_fetchUrlQueryString.Token}"
-                : $"{serverUrlRaw}?token={_settingsDescriptor.DeveloperDebugToken}";
+            var host = _webGlHostWrapper.GetParentHostSafe();
+            var protocol = _webGlHostWrapper.GetWebSocketProtocolSafe();
+            var shouldUseHost = string.IsNullOrEmpty(host) == false && string.IsNullOrEmpty(protocol) == false;
+            var fullUrl = shouldUseHost ? $"{protocol}//{host}/ws" : string.Empty;
+            var token = isDebug == false ? _fetchUrlQueryString.Token : _settingsDescriptor.DeveloperDebugToken;
+            
+            var serverUrl = $"{serverUrlRaw}?token={token}";
+
+            if (shouldUseHost)
+            {
+                serverUrl = $"{fullUrl}?token={token}";
+            }
+
+            if (_sessionPayload != null)
+            {
+                serverUrl = $"{_sessionPayload.WsUrl}?token={_sessionPayload.Token}";
+            }
+
+            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(StartConnectionAsync)}] OK: {serverUrl}, fullUrl: {fullUrl}");
 
             var websocketUri =
                 new Uri(serverUrl);
