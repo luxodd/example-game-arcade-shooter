@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3412c4b4ccab962408d5562d9e32c9c5, type: 3}
   m_Name: NetworkSettingsDescriptor
   m_EditorClassIdentifier: 
-  <ServerAddress>k__BackingField: wss://staging-app.luxodd.com/ws
-  <DeveloperDebugToken>k__BackingField: luxodd_SM4qcvXS_F3dg8Ju756xXqUo5N17xrTP9
+  <ServerAddress>k__BackingField: wss://app.luxodd.com/ws
+  <DeveloperDebugToken>k__BackingField: luxodd_91tmpk3Y_Gx6KQ4Y4nwY2zSVjdSLTtJNn

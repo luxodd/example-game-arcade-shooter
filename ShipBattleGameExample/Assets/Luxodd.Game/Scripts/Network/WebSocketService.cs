@@ -6,6 +6,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Luxodd.Game.HelpersAndUtils.Utils;
 using Luxodd.Game.Scripts.HelpersAndUtils;
 using Luxodd.Game.Scripts.HelpersAndUtils.Logger;
 using Luxodd.Game.Scripts.Network.CommandHandler;
@@ -22,7 +23,9 @@ namespace Luxodd.Game.Scripts.Network
     {
         public bool IsConnected => _isConnected;
         public string SessionToken => GetSessionToken();
-
+        public ISimpleEvent<bool> ConnectedToServerEvent =>  _isConnectedEvent;
+        
+        
         [SerializeField] private NetworkSettingsDescriptor _settingsDescriptor = null;
         [SerializeField] private WebSocketLibraryWrapper _socketLibraryWrapper = null;
 
@@ -47,6 +50,8 @@ namespace Luxodd.Game.Scripts.Network
         private Action _onConnectionErrorCallback;
 
         private Action<SessionOptionAction> _onSessionOptionCallback;
+        
+        private readonly SimpleEvent<bool> _isConnectedEvent = new SimpleEvent<bool>();
 
         private Dictionary<CommandRequestType, Queue<CommandRequestHandler>> _commandRequestHandlers =
             new Dictionary<CommandRequestType, Queue<CommandRequestHandler>>();
@@ -78,6 +83,7 @@ namespace Luxodd.Game.Scripts.Network
             _clientWebSocket
                 ?.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close Application", CancellationToken.None)?.Wait();
 #endif
+            _isConnectedEvent.Notify(_isConnected);
         }
 
         public void BackToSystemWithError(string message, string error)
@@ -263,6 +269,7 @@ namespace Luxodd.Game.Scripts.Network
                 await _clientWebSocket.ConnectAsync(websocketUri, CancellationToken.None);
                 _isConnected = true;
                 _wasConnected = true;
+                
                 LoggerHelper.Log(
                     $"[{DateTime.Now}][{GetType().Name}][{nameof(StartConnectionAsync)}] OK, connected to: {websocketUri.AbsoluteUri}");
                 OnWebSocketConnectedHandler();
@@ -277,6 +284,7 @@ namespace Luxodd.Game.Scripts.Network
             }
 
 #endif
+            _isConnectedEvent.Notify(_isConnected);
         }
 
         private void OnMessageReceived(string message)
@@ -381,6 +389,7 @@ namespace Luxodd.Game.Scripts.Network
             Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnWebSocketConnectedHandler)}] OK");
             _isConnected = true;
             _wasConnected = true;
+            _isConnectedEvent.Notify(_isConnected);
             _onConnectedCallback?.Invoke();
         }
 

@@ -1,4 +1,6 @@
+using Luxodd.Game;
 using Luxodd.Game.HelpersAndUtils.Utils;
+using Luxodd.Game.Scripts.Input;
 using UnityEngine;
 
 namespace Game.PlayerShip
@@ -29,15 +31,16 @@ namespace Game.PlayerShip
         {
             if (_isInTheGame == false) return;
 
-            MovementVector = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+            var stick = ArcadeControls.GetStick();
+            MovementVector = stick.Vector;
             IsMoving = MovementVector != Vector2.zero;
 
-            if (Input.GetButtonDown("Fire1") || Input.GetKeyDown(_attackPrimaryKeyCode))
+            if (ArcadeControls.GetButtonDown(ArcadeButtonColor.Black) || Input.GetKeyDown(_attackPrimaryKeyCode))
             {
                 PrimaryAttack.Notify();
             }
 
-            if (Input.GetButtonDown("Fire2") || Input.GetKeyDown(_attackSecondaryKeyCode))
+            if (ArcadeControls.GetButtonDown(ArcadeButtonColor.Red)|| Input.GetKeyDown(_attackSecondaryKeyCode))
             {
                 SecondaryAttack.Notify();
             }

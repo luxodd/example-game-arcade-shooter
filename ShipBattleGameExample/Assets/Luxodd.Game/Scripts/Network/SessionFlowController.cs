@@ -4,8 +4,17 @@ using UnityEngine;
 
 namespace Luxodd.Game.Scripts.Network
 {
+    public enum SessionFlowResult
+    {
+        EventPath,
+        LegacyPath,
+        Error
+    }
+    
     public class SessionFlowController : MonoBehaviour
     {
+        public bool SessionPayloadIsPresent => _sessionPayload != null;
+        
         [SerializeField] private float _waitTimeoutSeconds = 5f;
         [SerializeField] private LuxoddSessionBridge _sessionBridge;
         [SerializeField] private WebSocketService _socketService;

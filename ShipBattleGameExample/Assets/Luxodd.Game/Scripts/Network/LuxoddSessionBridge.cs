@@ -88,6 +88,7 @@ namespace Luxodd.Game.Scripts.Network
 
             try
             {
+#if NEWTONSOFT_JSON
                 var payload = JsonConvert.DeserializeObject<LuxoddSessionPayload>(json);
                 if (payload != null)
                 {
@@ -95,6 +96,7 @@ namespace Luxodd.Game.Scripts.Network
                     WebSocketUrl = payload.WsUrl;
                     SessionPayload = payload;
                 }
+                #endif
             }
             catch (Exception e)
             {

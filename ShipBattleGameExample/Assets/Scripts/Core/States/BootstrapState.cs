@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Core.Audio;
 using Core.Storage;
 using Core.UI;
@@ -20,20 +21,24 @@ namespace Core.States
     public class BootstrapState : BaseState
     {
         [SerializeField] private UIManager _uiManager;
-        [FormerlySerializedAs("_websocketService")] [SerializeField] private WebSocketService _webSocketService;
+
+        [FormerlySerializedAs("_websocketService")] [SerializeField]
+        private WebSocketService _webSocketService;
+
         [SerializeField] private WalletService _walletService;
         [SerializeField] private AudioManager _audioManager;
         [SerializeField] private HealthStatusCheckService _healthStatusCheckService;
         [SerializeField] private LeaderboardService _leaderboardService;
         [SerializeField] private StorageService _storageService;
-        
-        [SerializeField] private WebSocketCommandHandler _websocketCommandHandler;
+
+        [SerializeField] private WebSocketCommandHandler _webSocketCommandHandler;
 
         [SerializeField] private DefaultGameSettings _defaultGameSettings;
         [SerializeField] private PlayerBehaviour _playerBehaviour;
 
-        [Header("UI Handlers")]
-        [SerializeField] private LoadingScreenHandler _loadingScreenHandler;
+        [Header("UI Handlers")] [SerializeField]
+        private LoadingScreenHandler _loadingScreenHandler;
+
         [SerializeField] private MainMenuHandler _mainMenuHandler;
         [SerializeField] private GameScreenHandler _gameScreenHandler;
         [SerializeField] private ReconnectionWindowHandler _reconnectionWindowHandler;
@@ -48,22 +53,15 @@ namespace Core.States
         [SerializeField] private CompletedDemoWindowHandler _completedDemoWindowHandler;
         [SerializeField] private ReplayLevelWindowHandler _replayLevelWindowHandler;
         [SerializeField] private SessionFlowController _sessionFlowController;
-        
-        [Header("For Debugging")]
-        [SerializeField] private bool _needToConnectToServer = true;
+
+        [Header("For Debugging")] [SerializeField]
+        private bool _needToConnectToServer = true;
 
         public override void OnStateEnter()
         {
             _storageService.Register(_playerBehaviour);
-            
+
             LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnStateEnter)}] OK");
-            if (_needToConnectToServer)
-            {
-                // _webSocketService.ConnectToServer(OnConnectedToServerSuccessHandler,
-                //     () => OnConnectedToServerFailureHandler(-1,null));
-                
-                _sessionFlowController.ActivateProcess(OnConnectedToServerSuccessHandler, ()=> OnConnectedToServerFailureHandler(-1, null));
-            }
 
             var loadingScreenView = _uiManager.ProvideView<ILoadingScreenView>(ViewType.LoadingScreen);
             _loadingScreenHandler.PrepareView(loadingScreenView);
@@ -83,8 +81,9 @@ namespace Core.States
 
             var gameOverWindowView = _uiManager.ProvideView<IGameOverWindowView>(ViewType.GameOverWindow);
             _gameOverWindowHandler.PrepareView(gameOverWindowView);
-            
-            var levelCompleteWindowView = _uiManager.ProvideView<ILevelCompleteWindowView>(ViewType.LevelCompleteWindow);
+
+            var levelCompleteWindowView =
+                _uiManager.ProvideView<ILevelCompleteWindowView>(ViewType.LevelCompleteWindow);
             _levelCompleteWindowHandler.PrepareLevelCompleteWindow(levelCompleteWindowView);
 
             var notEnoughMoneyWindowView =
@@ -93,11 +92,12 @@ namespace Core.States
 
             var creditsWidgetView = _uiManager.ProvideView<ICreditsWidgetView>(ViewType.CreditsWidget);
             _creditsWidgetHandler.PrepareView(creditsWidgetView);
-            
+
             var leaderboardWindowView = _uiManager.ProvideView<ILeaderboardWindowView>(ViewType.LeaderboardWindow);
             _leaderboardWindowHandler.PrepareView(leaderboardWindowView);
-            
-            var pinCodeEnteringPopupView = _uiManager.ProvideView<IPinCodeEnteringPopupView>(ViewType.PinCodeEnteringPopup);
+
+            var pinCodeEnteringPopupView =
+                _uiManager.ProvideView<IPinCodeEnteringPopupView>(ViewType.PinCodeEnteringPopup);
             _pinCodeEnteringPopupHandler.PrepareView(pinCodeEnteringPopupView);
 
             var numericKeyboardPopupView =
@@ -106,14 +106,22 @@ namespace Core.States
             _numericKeyboardPopupHandler.PrepareInputField(_pinCodeEnteringPopupHandler.PinCodeInputField);
 
             _walletService.Credits.AddListener(_mainMenuHandler.OnCreditsCountChangedHandler);
-            
-            var completedDemoWindowView = _uiManager.ProvideView<ICompletedDemoWindowView>(ViewType.CompletedDemoWindow);
+
+            var completedDemoWindowView =
+                _uiManager.ProvideView<ICompletedDemoWindowView>(ViewType.CompletedDemoWindow);
             _completedDemoWindowHandler.PrepareView(completedDemoWindowView);
 
             var replayLevelWindowView = _uiManager.ProvideView<IReplayLevelWindowView>(ViewType.ReplayDemoWindow);
             _replayLevelWindowHandler.PrepareView(replayLevelWindowView);
 
             SetupDefaultGameSettings();
+
+
+            if (_needToConnectToServer)
+            {
+                _ = ConnectionOrchestratorLogicAsync();
+            }
+
         }
 
         public override void OnStateExit()
@@ -126,7 +134,7 @@ namespace Core.States
             _audioManager.SetupMusicDefaultVolume(_defaultGameSettings.MusicVolume);
             _audioManager.SetupSfxDefaultVolume(_defaultGameSettings.SfxVolume);
             _walletService.SetCredits(_defaultGameSettings.CreditsCount);
-            
+
             Application.targetFrameRate = 60;
             Application.runInBackground = true;
             Application.backgroundLoadingPriority = ThreadPriority.Low;
@@ -135,11 +143,11 @@ namespace Core.States
         private void OnConnectedToServerSuccessHandler()
         {
             LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnConnectedToServerSuccessHandler)}] OK");
-            
+
             _leaderboardService.PullLastLeaderboardData(
-                ()=> _leaderboardWindowHandler.PrepareLeaderboardEntries(_leaderboardService.LeaderboardData),
+                () => _leaderboardWindowHandler.PrepareLeaderboardEntries(_leaderboardService.LeaderboardData),
                 null);
-            CoroutineManager.NextFrameAction(1, ()=>_storageService.Load());
+            CoroutineManager.NextFrameAction(1, () => _storageService.Load());
             _healthStatusCheckService.Activate();
         }
 
@@ -147,7 +155,8 @@ namespace Core.States
         private void TestSendRequestForBalance()
         {
             LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(TestSendRequestForBalance)}] OK");
-            _websocketCommandHandler.SendUserBalanceRequestCommand(OnUserBalanceRequestSuccessHandler, OnUserBalanceRequestFailureHandler);
+            _webSocketCommandHandler.SendUserBalanceRequestCommand(OnUserBalanceRequestSuccessHandler,
+                OnUserBalanceRequestFailureHandler);
         }
 
         private void OnConnectedToServerFailureHandler(int statusCode, string errorMessage)
@@ -158,24 +167,28 @@ namespace Core.States
 
         private void OnProfileRequestSuccessHandler(string profileName)
         {
-            LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnProfileRequestSuccessHandler)}] OK, profileName: {profileName}");
+            LoggerHelper.Log(
+                $"[{DateTime.Now}][{GetType().Name}][{nameof(OnProfileRequestSuccessHandler)}] OK, profileName: {profileName}");
             _playerBehaviour.SetPlayerName(profileName);
         }
 
         private void OnProfileRequestFailureHandler(int statusCode, string errorMessage)
         {
-            LoggerHelper.LogError($"[{DateTime.Now}][{GetType().Name}][{nameof(OnProfileRequestFailureHandler)}] OK, status: {statusCode} Error: {errorMessage}");
+            LoggerHelper.LogError(
+                $"[{DateTime.Now}][{GetType().Name}][{nameof(OnProfileRequestFailureHandler)}] OK, status: {statusCode} Error: {errorMessage}");
         }
 
         private void OnUserBalanceRequestSuccessHandler(float balance)
         {
-            LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnUserBalanceRequestSuccessHandler)}] OK, balance: {balance}");
+            LoggerHelper.Log(
+                $"[{DateTime.Now}][{GetType().Name}][{nameof(OnUserBalanceRequestSuccessHandler)}] OK, balance: {balance}");
             _walletService.SetCredits(balance);
         }
 
         private void OnUserBalanceRequestFailureHandler(int statusCode, string errorMessage)
         {
-            LoggerHelper.LogError($"[{DateTime.Now}][{GetType().Name}][{nameof(OnUserBalanceRequestFailureHandler)}] OK, status:{statusCode} Error: {errorMessage}");
+            LoggerHelper.LogError(
+                $"[{DateTime.Now}][{GetType().Name}][{nameof(OnUserBalanceRequestFailureHandler)}] OK, status:{statusCode} Error: {errorMessage}");
         }
 
         private void OnApplicationQuit()
@@ -188,6 +201,39 @@ namespace Core.States
             if (pauseStatus)
             {
                 _healthStatusCheckService?.Deactivate();
+            }
+        }
+
+        private async Task ConnectionOrchestratorLogicAsync()
+        {
+            try
+            {
+                var sessionFlowTask = _sessionFlowController.RunAsync();
+                await sessionFlowTask;
+
+                if (sessionFlowTask.Result != SessionFlowResult.Error)
+                {
+                    OnConnectedToServerSuccessHandler();
+                }
+                else
+                {
+                    OnConnectedToServerFailureHandler(-1, "ConnectionOrchestratorLogicAsync: connection failed");
+                    return;
+                }
+
+
+                var profileTask = _webSocketCommandHandler.GetProfileAsync();
+                var balanceTask = _webSocketCommandHandler.GetUserBalanceAsync();
+
+                var profile = await profileTask;
+                var balance = await balanceTask;
+                OnProfileRequestSuccessHandler(profile);
+                OnUserBalanceRequestSuccessHandler(balance);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(
+                    $"[{DateTime.Now}][{GetType().Name}][{nameof(ConnectionOrchestratorLogicAsync)}] Error: {e.Message}");
             }
         }
     }

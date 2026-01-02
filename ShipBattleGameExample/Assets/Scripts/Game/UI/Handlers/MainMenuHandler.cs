@@ -1,5 +1,6 @@
 using System;
 using Game.Player;
+using Luxodd.Game;
 using Luxodd.Game.Scripts;
 using Luxodd.Game.Scripts.HelpersAndUtils;
 using Luxodd.Game.Scripts.HelpersAndUtils.Logger;
