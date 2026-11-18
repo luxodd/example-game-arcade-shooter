@@ -28,14 +28,16 @@ mergeInto(LibraryManager.library, {
             var d = e.data;
             if (!d || typeof d !== "object") return;
 
+            if (d.type === "restart_prepare") {
+                if (typeof d.requestId === "string" && d.requestId.trim().length > 0) {
+                    sendToUnity("OnHostRestartPrepare", d.requestId);
+                }
+                return;
+            }
+
             // Хост сейчас шлёт { action: "restart|continue|end" }
             if (typeof d.action === "string") {
                 sendToUnity("OnHostSessionAction", d.action);
-            }
-
-            // Хост шлёт { jwt: "..." } на старте
-            if (typeof d.jwt === "string") {
-                sendToUnity("OnHostJwt", d.jwt);
             }
 
             // На будущее: если добавят типизированный ответ

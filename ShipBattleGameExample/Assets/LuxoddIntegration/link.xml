@@ -1,0 +1,10 @@
+<!-- Keeps the plugin members that Luxodd.Integration (LuxoddScore, LuxoddLayout) reads by name,
+     so they survive managed code stripping in WebGL builds: ScoreUpdateService's handler field
+     (plugin 1.2.0), ReportScore (1.3.0+) and the runtime context properties. -->
+<linker>
+  <assembly fullname="Luxodd.Game.Runtime" ignoreIfMissing="1">
+    <type fullname="Luxodd.Game.Scripts.Network.ScoreUpdateService" preserve="all" />
+    <type fullname="Luxodd.Game.Scripts.Network.CommandHandler.WebSocketCommandHandler" preserve="methods" />
+    <type fullname="Luxodd.Game.Scripts.Runtime.Viewport.Context.LuxoddRuntimeContext" preserve="all" />
+  </assembly>
+</linker>

@@ -238,42 +238,28 @@ namespace Core.States
             PrepareAndShowContinueGameWindow();
         }
         
+        // Luxodd (integration criteria ES-1..ES-8): this attempt's level_end first, then ONE host
+        // popup: Continue / Restart (Fast Restart) / End. The host owns the prices and the timeout.
         private void PrepareAndShowContinueGameWindow()
         {
-            _continueGameWindowHandler.SetContinueButtonClickCallback(OnContinueGameWindowContinueButtonClickHandler);
-            _continueGameWindowHandler.SetCancelButtonClickCallback(OnContinueGameWindowCancelButtonClickHandler);
-            
-            _continueGameWindowHandler.ShowContinueGameWindow();
-            
-            //_webSocketService.SendSessionOptionContinue(OnSessionOptionContinueCallback);
-        }
-
-        [ContextMenu("Test Continue Session")]
-        private void TestContinueSessionCallback()
-        {
-            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(TestContinueSessionCallback)}] OK");
-            OnSessionOptionContinueCallback(SessionOptionAction.Continue);
-        }
-        
-        [ContextMenu("Test Restart Session")]
-        private void TestRestartSessionCallback()
-        {
-            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(TestRestartSessionCallback)}] OK");
-            OnSessionOptionContinueCallback(SessionOptionAction.Restart);
-        }
-        
-        [ContextMenu("Test Cancel Session")]
-        private void TestCancelSessionCallback()
-        {
-            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(TestCancelSessionCallback)}] OK");
-            OnSessionOptionContinueCallback(SessionOptionAction.Cancel);
-        }
-        
-        [ContextMenu("Test Cancel Session")]
-        private void TestEndSessionCallback()
-        {
-            Debug.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(TestEndSessionCallback)}] OK");
-            OnSessionOptionContinueCallback(SessionOptionAction.End);
+            var levelStatisticData = PrepareLevelStatistics();
+            Luxodd.Integration.LuxoddRunFlow.EndAttempt(_webSocketService, _webSocketCommandHandler,
+                _playerBehaviour.CurrentLevel, levelStatisticData.TotalScore,
+                onContinue: () =>
+                {
+                    _playerStatisticTrackingController.StartTracking();
+                    Luxodd.Integration.LuxoddRunFlow.BeginAttempt(_webSocketCommandHandler, _playerBehaviour.CurrentLevel,
+                        _scoreManager.Score.Value);
+                    OnContinueGameChargeSuccessHandler();
+                },
+                onRestart: ApplyRestartGame,
+                onEnd: () =>
+                {
+                    EventAggregator.Post(this,
+                        new GameOverEvent() { CurrentLevelPosition = _cameraFollowBehaviour.CurrentPosition });
+                    _gameOverWindowHandler.HideGameOverWindow();
+                    _gameScreenHandler.HideGameScreen();
+                });
         }
 
         private void OnSessionOptionContinueCallback(SessionOptionAction sessionOptionAction)
@@ -386,6 +372,18 @@ namespace Core.States
 
         private LevelStatisticData PrepareAndSendLevelStatistics()
         {
+            var levelStatisticData = PrepareLevelStatistics();
+            var level = _playerBehaviour.CurrentLevel;
+            Luxodd.Integration.LuxoddScore.BeforeLevelEnd(level, levelStatisticData.TotalScore, () =>
+                _webSocketCommandHandler.SendLevelEndRequestCommand(level,
+                    levelStatisticData.TotalScore, OnLevelEndRequestSuccessHandler, OnLevelEndRequestFailureHandler),
+                _webSocketCommandHandler);
+            return levelStatisticData;
+        }
+
+        // The run's statistics and the game-over comparison, without sending anything.
+        private LevelStatisticData PrepareLevelStatistics()
+        {
             _scoreManager.RecordResult();
             _playerStatisticTrackingController.StopTracking();
 
@@ -407,10 +405,6 @@ namespace Core.States
             }
 
             _leaderboardService.LogPlayerLevelResult(levelStatisticData);
-
-            _webSocketCommandHandler.SendLevelEndRequestCommand(_playerBehaviour.CurrentLevel,
-                levelStatisticData.TotalScore, OnLevelEndRequestSuccessHandler, OnLevelEndRequestFailureHandler);
-            
             return levelStatisticData;
         }
 
@@ -504,9 +498,14 @@ namespace Core.States
                 _playerStatisticTrackingController.LevelProgress,
                 _playerStatisticTrackingController.TotalSeconds);
 
-            _webSocketCommandHandler.SendLevelEndRequestCommand(_playerBehaviour.CurrentLevel,
-                levelStatisticData.TotalScore, OnLevelEndRequestSuccessHandler, OnLevelEndRequestFailureHandler);
-            
+            // The score the player saw (TP-1, TP-4): this used LevelStatisticData.CreateRandom().TotalScore.
+            var completedLevel = _playerBehaviour.CurrentLevel;
+            var completedScore = _scoreManager.Score.Value;
+            Luxodd.Integration.LuxoddScore.BeforeLevelEnd(completedLevel, completedScore, () =>
+                _webSocketCommandHandler.SendLevelEndRequestCommand(completedLevel,
+                    completedScore, OnLevelEndRequestSuccessHandler, OnLevelEndRequestFailureHandler),
+                _webSocketCommandHandler);
+
             _levelCompleteWindowHandler.ShowLevelCompleteWindow();
 
             _playerBehaviour.CompleteLevel();
@@ -577,10 +576,12 @@ namespace Core.States
         private void OnScoreChangedHandler(int score)
         {
             _gameScreenHandler.SetPlayerScore(score);
+            Luxodd.Integration.LuxoddScore.Report(_playerBehaviour.CurrentLevel, score, _webSocketCommandHandler);
         }
         
         private void OnLevelBeginRequestSuccessHandler()
         {
+            Luxodd.Integration.LuxoddScore.LevelBegun(_playerBehaviour.CurrentLevel, _scoreManager.Score.Value, _webSocketCommandHandler);
             LoggerHelper.Log($"[{DateTime.Now}][{GetType().Name}][{nameof(OnLevelBeginRequestSuccessHandler)}] OK");
         }
 

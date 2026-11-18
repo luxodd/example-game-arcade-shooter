@@ -31,7 +31,7 @@ namespace Game.PlayerShip
         {
             if (_isInTheGame == false) return;
 
-            var stick = ArcadeControls.GetStick();
+            var stick = Luxodd.Integration.LuxoddStick.Get();
             MovementVector = stick.Vector;
             IsMoving = MovementVector != Vector2.zero;
 
