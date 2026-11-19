@@ -242,6 +242,10 @@ namespace Core.States
         // popup: Continue / Restart (Fast Restart) / End. The host owns the prices and the timeout.
         private void PrepareAndShowContinueGameWindow()
         {
+            // The level-progress tracker reads the player's position from GameOverEvent; post it
+            // before the statistics are computed (a null position threw and level_end was never sent).
+            EventAggregator.Post(this,
+                new GameOverEvent() { CurrentLevelPosition = _cameraFollowBehaviour.CurrentPosition });
             var levelStatisticData = PrepareLevelStatistics();
             Luxodd.Integration.LuxoddRunFlow.EndAttempt(_webSocketService, _webSocketCommandHandler,
                 _playerBehaviour.CurrentLevel, levelStatisticData.TotalScore,
