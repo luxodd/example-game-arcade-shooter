@@ -28,7 +28,7 @@ mergeInto(LibraryManager.library, {
                 // arg should be string
                 unityInstance.SendMessage(S.targetGO, method, arg || "");
             } else {
-                console.warn("[LuxoddSession] unityInstance is not defined, drop", method, arg);
+                console.warn("[LuxoddSession] unityInstance is not defined; session event was not forwarded.");
             }
         }
 
@@ -36,7 +36,7 @@ mergeInto(LibraryManager.library, {
             try {
                 var d = e && e.detail;
                 if (!d || typeof d !== "object") {
-                    console.warn("[LuxoddSession] invalid event.detail:", d);
+                    console.warn("[LuxoddSession] invalid session event detail.");
                     return;
                 }
 
@@ -54,13 +54,15 @@ mergeInto(LibraryManager.library, {
 
                 var payload = JSON.stringify({
                     token: S.token,
-                    wsUrl: S.wsUrl
+                    wsUrl: S.wsUrl,
+                    runtime: d.runtime && typeof d.runtime === "object" && !Array.isArray(d.runtime)
+                        ? d.runtime : undefined
                 });
 
-                console.log("[LuxoddSession] received session:", payload);
+                console.log("[LuxoddSession] session event received.");
                 sendToUnity("OnLuxoddSession", payload);
             } catch (err) {
-                console.error("[LuxoddSession] error in onLuxoddSession:", err);
+                console.error("[LuxoddSession] failed to process session event.");
             }
         }
 

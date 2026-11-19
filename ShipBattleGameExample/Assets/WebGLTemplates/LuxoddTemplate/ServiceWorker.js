@@ -27,6 +27,12 @@ self.addEventListener('install', function (e) {
 
 #if USE_DATA_CACHING
 self.addEventListener('fetch', function (e) {
+    if (e.request.method !== 'GET' || e.request.headers.has('Authorization') || !contentToCache.some(function (path) {
+      return new URL(path, self.registration.scope).href === e.request.url;
+    })) {
+      return;
+    }
+
     e.respondWith((async function () {
       let response = await caches.match(e.request);
       console.log(`[Service Worker] Fetching resource: ${e.request.url}`);

@@ -4,6 +4,134 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.2.0] - 2026-09-15
+
+### Added
+- Added a reusable Arcade Control Legend with sequential display numbers for all eight button colors, from Black 1 through White 8. The six gameplay action labels remain configurable.
+- Added `GameType.MerchantPrize`.
+- Added Merchant Prize payload fields: `TargetDwellSeconds`, `PointsPerSecond`, `PrizeDescription`, and `PlayerName`. `PointsPerSecond` remains server-provided.
+- Added score-centered runtime leaderboard APIs: `GetLeaderboardAroundScoreAsync(int score)` and `SendLeaderboardAroundScoreRequestCommand(...)`.
+- Added an Editor first-run dialog that can open the Example Scene, plus the `Luxodd > Open Example Scene` menu command.
+- Added Fast Restart support for WebGL session restarts while keeping the game loaded.
+- Added Continue session handling, startup lifecycle handling, and runtime context and Metadata integration.
+- Added `score_update` request/response support.
+- Added Example Scene diagnostics and EditMode/PlayMode coverage for Fast Restart session handoffs and score updates.
+
+### Changed
+- Updated the custom WebGL manifest template for Unity 2022 compatibility.
+- Session tokens are no longer printed in normal connection or session logs.
+
+### Fixed
+- Fixed overlapping same-type WebSocket requests so each request keeps isolated handler and callback state.
+- The Arcade Control Legend displays Orange as Button 7 (Help) and White as Button 8 (Menu); their existing runtime input bindings are unchanged.
+- Added a bounded response timeout so unanswered WebSocket commands fail through the normal failure path instead of waiting indefinitely. After a timeout, the transport generation is reset safely and the plugin reconnects; stale responses from the previous transport cannot be assigned to new requests. Application commands are not automatically retried.
+- Fixed WebGL Fast Restart replacement-session handoff and reconnect handling, including early replacement-session buffering and stale socket callback isolation.
+- Restricted Service Worker caching to listed static GET resources without Authorization headers.
+- Removed obsolete `OnHostJwt` forwarding.
+
+### Known Limitations
+- Cross-scene SDK persistence is not guaranteed; host/browser Metadata integration is not fully validated.
+- Some example scenes may require optional Unity packages or cleanup of serialized components.
+- Basic WebGL integration was tested with Unity 2021.3.45f2; not all SDK flows were validated. Unity 2022 LTS remains the minimum supported version.
+
+## [1.1.1] - 2026-08-18
+
+### Changed
+- Added standard gamepad D-pad support for `ArcadeControls` joystick input.
+- Updated the Control Test to clarify that the current Luxodd arcade joystick is digital/on-off and does not provide analog pressure.
+- Improved Control Test input validation and readability.
+
+### Fixed
+- Fixed WebGL WebSocket sends during the CONNECTING state that could cause `InvalidStateError`.
+- Messages sent while the WebSocket is connecting are now queued and flushed in FIFO order after the connection opens.
+- Stale or replaced WebSocket callbacks no longer interfere with the active connection.
+- Fixed TextMesh Pro rendering artifacts in the Control Test.
+
+## [1.1.0] - 2026-08-13
+
+### Added
+- Added asmdef-based modular architecture:
+  - `Luxodd.Game.Runtime`
+  - `Luxodd.Game.InputSystem` (optional)
+  - `Luxodd.Game.Editor`
+  - `Luxodd.Game.InputSystem.Editor`
+- Added optional Input System backend contract and implementation:
+  - `IArcadeControlsBackend`
+  - `ArcadeControlsInputSystemBackend`
+- Added optional Input System compile gating through asmdef `versionDefines` + `defineConstraints` (`LUXODD_INPUT_SYSTEM`).
+- Added arcade button mapping diagnostic example aligned with the physical arcade button layout.
+- Added joystick visualization example with shader-based visual feedback.
+- Added explicit `Unity.TextMeshPro` and `Unity.ugui` runtime asmdef references.
+- Added export-contained example font and TMP resource references under `Assets/Luxodd.Game`.
+
+### Changed
+- Split `ArcadeControls` into:
+  - Core facade with legacy-safe fallback behavior
+  - Optional Input System backend in separate assembly
+- Moved runtime code into `Assets/Luxodd.Game/Runtime/Core/**`.
+- Moved Input System specific runtime code into `Assets/Luxodd.Game/Runtime/InputSystem/**`.
+- Moved editor tooling into `Assets/Luxodd.Game/Editor/Core/**`.
+- Moved Input System diagnostic example to `Assets/Luxodd.Game/Example/Scripts/InputSystem/**`.
+- Updated assembly references:
+  - `Luxodd.Game.Runtime` now references `Unity.TextMeshPro`.
+  - `Luxodd.Game.InputSystem` now references `Unity.InputSystem`.
+- Updated `EventSystemInputModuleSwitcher` to detect Input System UI modules at runtime without a compile-time dependency on `LUXODD_INPUT_SYSTEM` in Core.
+- Current arcade joystick hardware behavior is digital-direction oriented (typically 0/1 states), while the public API remains `Vector2`-compatible for future analog hardware.
+- `Assets/WebGLTemplates/LuxoddTemplate/**` is part of required release content for WebGL/browser integration.
+- Projects upgrading from previous plugin structure should remove old plugin files before importing `1.1.0` to avoid stale files from legacy paths.
+- Legacy Input fallback returns neutral values when Legacy Input Manager is unavailable.
+- Every non-empty `prize_tickets` response is forwarded as `prize_won`, including repeated identical payloads.
+- Selected backend command handlers log safe metadata instead of full payload contents.
+- Package export guidance uses `Assets/Luxodd.Game/**` and `Assets/WebGLTemplates/LuxoddTemplate/**`.
+
+### Fixed
+- Fixed Core Legacy Input exceptions in Input System Package-only projects.
+- Fixed `EventSystemInputModuleSwitcher` calling `DestroyImmediate` from `OnValidate`.
+- Fixed the missing `Unity.ugui` runtime assembly reference.
+- Fixed repeated identical prize ticket responses being dropped before frontend forwarding.
+- Removed full prize ticket JSON and selected full backend payload logs.
+- Fixed example prefab and scene dependencies on root `Assets/Fonts` and `Assets/TextMesh Pro` folders.
+
+### Removed
+- Removed duplicate `prize_won` payload suppression.
+- Removed plugin example dependencies on root `Assets/Fonts` and `Assets/TextMesh Pro`.
+
+### Known Limitations
+- Score signing/encryption is not included in 1.1.0.
+- Final Unity 2022 LTS, Unity 6+, clean-project, and WebGL browser validation remains required before future release publication.
+- Broader transport, token, URL, and session logging hardening remains future work.
+
+## [1.0.12] - 2026-02-16
+
+### Added
+- Added mobile detection demo example.
+- Added screen resize detection with event propagation.
+- Added orientation handling demo (portrait/landscape example panel).
+- Added WebGL Safe Area applier for mobile browsers.
+- Added additional debug information for mobile runtime validation.
+- Added UI layout example scene updates for mobile testing.
+
+### Changed
+- Updated mobile detection logic and orientation handling flow.
+- Improved Unity logo resizing behavior.
+- Updated example scene structure and related UI handlers.
+- Updated LuxoddRuntimeContext to support VisualViewport integration.
+- Updated WebGL template integration (LuxoddRuntimeContext.jslib adjustments).
+
+### Fixed
+- Fixed UI layout issues on mobile devices.
+- Fixed orientation-related UI inconsistencies.
+- Minor runtime fixes and cleanup.
+
+## [1.0.10] — 2026-01-12
+### Fixed
+- Fixed an issue with **WebSocket connection in local WebGL builds**:
+  - The server address was resolved incorrectly when running WebGL builds locally.
+  - Updated logic now uses the correct server address, preventing connection errors during local testing.
+
+### Changed
+- Replaced the default Unity splash logo with the **Luxodd logo** displayed on WebGL game startup.
+
 ## [1.0.9] — 2026-01-01
 ### Added
 - Added a **full gameplay-based Controlling Test scene**:
