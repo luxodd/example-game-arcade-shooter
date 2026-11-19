@@ -61,8 +61,11 @@ namespace Game.Enemy
         {
             _isAttacking = true;
 
+            // An enemy can be activated before ProvideDependencies (seen on Fast Restart): wait for its weapon.
+            while (_weaponData == null && _isAttacking) yield return null;
+            if (_weaponData == null) yield break;
             yield return new WaitForSeconds(_weaponData.DelayBeforeAttack.GetRandom());
-            while (_isAttacking)
+            while (_isAttacking && _weaponData != null)
             {
                 if (IsCanAttack == false)
                 {
@@ -70,8 +73,16 @@ namespace Game.Enemy
                 }
 
                 var count = 0;
-                while (count < _weaponData.QuantityPerTime)
+                while (_weaponData != null && count < _weaponData.QuantityPerTime)
                 {
+                    // Restart destroys the player ship and the level (the projectile parent) while this
+                    // coroutine waits; touching them then threw, which halts a release WebGL build.
+                    if (_weaponData == null || !_projectilePrefab || !_target || !_parentForProjectiles || !_projectileSpawnPoint)
+                    {
+                        _isAttacking = false;
+                        yield break;
+                    }
+
                     var projectile = Instantiate(_projectilePrefab, _parentForProjectiles);
                     projectile.transform.position = _projectileSpawnPoint.position;
                     projectile.transform.rotation = _projectileSpawnPoint.rotation;
@@ -91,10 +102,12 @@ namespace Game.Enemy
                         _weaponData.AutoDestroyTime, _projectileSpawnPoint.position, _projectileSpawnPoint.rotation,
                         direction);
                     count++;
-                    AudioManager.Instance.PlaySfx(_gunSound);
+                    if (AudioManager.Instance) AudioManager.Instance.PlaySfx(_gunSound);
+                    if (_weaponData == null) break;
                     yield return new WaitForSeconds(_weaponData.FireRate);
                 }
 
+                if (_weaponData == null) break;
                 yield return new WaitForSeconds(_weaponData.DelayBetweenAttacks.GetRandom());
             }
 
